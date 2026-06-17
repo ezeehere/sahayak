@@ -29,7 +29,6 @@ const sahayakWords = [
   { word: "Sahayak" },
   { word: "सहायक" },
   { word: "সহায়ক" },
-  { word: "সহায়ক" },
 ];
 
 function splitLetters(text) {
