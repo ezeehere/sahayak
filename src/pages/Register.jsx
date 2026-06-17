@@ -43,6 +43,23 @@ function Register() {
       navigate("/login");
     }, 800);
   }
+  async function registerWithGoogle(selectedRole) {
+    localStorage.setItem("sahayak_google_role", selectedRole);
+
+    const redirectTo = `${window.location.origin}/auth/callback`;
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo,
+      },
+    });
+
+    if (error) {
+      console.log(error);
+      setMessage(error.message);
+    }
+  }
 
   return (
     <main className="page-center">
@@ -98,6 +115,25 @@ function Register() {
             {t("createAccount")}
           </button>
         </form>
+        <div className="google-auth-box">
+          <p>Or continue with Google</p>
+
+          <button
+            type="button"
+            className="btn btn-google"
+            onClick={() => registerWithGoogle("seeker")}
+          >
+            Google as Job Seeker
+          </button>
+
+          <button
+            type="button"
+            className="btn btn-google owner-google-btn"
+            onClick={() => registerWithGoogle("owner")}
+          >
+            Google as Shop Owner
+          </button>
+        </div>
 
         <p className="form-bottom">
           {t("alreadyRegistered")} <Link to="/login">{t("login")}</Link>

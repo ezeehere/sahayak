@@ -31,6 +31,21 @@ function Login() {
     setMessage(t("loginSuccessful"));
     navigate("/dashboard");
   }
+  async function loginWithGoogle() {
+    const redirectTo = `${window.location.origin}/auth/callback`;
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo,
+      },
+    });
+
+    if (error) {
+      console.log(error);
+      setMessage(error.message);
+    }
+  }
 
   return (
     <main className="page-center">
@@ -56,6 +71,13 @@ function Login() {
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             required
           />
+          <button
+            type="button"
+            className="btn btn-google"
+            onClick={loginWithGoogle}
+          >
+            Continue with Google
+          </button>
 
           <button className="primary-btn" type="submit">
             {t("login")}

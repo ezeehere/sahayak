@@ -17,6 +17,10 @@ import ManageJobsPage from "./pages/admin/ManageJobs";
 import CategoriesPage from "./pages/admin/Categories";
 import OwnerDashboardPage from "./pages/owner/OwnerDashboard";
 import SeekerDashboardPage from "./pages/seeker/SeekerDashboard";
+import Home from "./pages/Home";
+import AuthCallback from "./pages/AuthCallback";
+
+
 
 
 function LoadingScreen({ text = "Loading..." }) {
@@ -67,54 +71,6 @@ function Navbar() {
   );
 }
 
-function Home() {
-  return (
-    <>
-      <Navbar />
-
-      <main className="hero">
-        <div className="hero-content">
-          <p className="tagline">Local Job Finder System</p>
-
-          <h1>
-            Find local jobs near you with <span>Sahayak</span>
-          </h1>
-
-          <p className="hero-text">
-            Sahayak connects job seekers with nearby shops and small businesses.
-            Job seekers can find work, shop owners can post vacancies, and admin
-            can manage the complete system.
-          </p>
-
-          <div className="hero-buttons">
-            <Link to="/register" className="btn btn-primary">
-              Get Started
-            </Link>
-
-            <Link to="/login" className="btn btn-light">
-              Login
-            </Link>
-          </div>
-        </div>
-
-        <div className="hero-card">
-          <h3>Core Modules</h3>
-
-          <div className="category-grid">
-            <span>Job Seeker</span>
-            <span>Shop Owner</span>
-            <span>Admin</span>
-            <span>Job Posts</span>
-            <span>Applications</span>
-            <span>Saved Jobs</span>
-            <span>Verified Shops</span>
-            <span>Supabase</span>
-          </div>
-        </div>
-      </main>
-    </>
-  );
-}
 
 function Login() {
   const navigate = useNavigate();
@@ -316,7 +272,7 @@ function DashboardRedirect() {
   }
 
   if (profile.role === "seeker") {
-    return <Navigate to="/seeker/dashboard" replace />; 
+    return <Navigate to="/seeker/dashboard" replace />;
   }
 
   if (profile.role === "owner") {
@@ -523,11 +479,14 @@ function ComingSoon({ title }) {
 function App() {
   return (
     <Routes>
+
       <Route path="/" element={<Home />} />
+
 
       <Route path="/login" element={<Login />} />
 
       <Route path="/register" element={<Register />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
 
       <Route
         path="/dashboard"
@@ -554,7 +513,7 @@ function App() {
         element={
           <ProtectedRoute>
             <RoleRoute allowedRole="seeker">
-                <SeekerProfile />
+              <SeekerProfile />
             </RoleRoute>
           </ProtectedRoute>
         }

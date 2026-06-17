@@ -1,15 +1,89 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
+  ArrowRight,
+  BadgeCheck,
   BriefcaseBusiness,
   Building2,
+  CheckCircle2,
   ClipboardList,
+  Languages,
+  MapPin,
+  PlusCircle,
+  SearchCheck,
+  Send,
   ShieldCheck,
+  Sparkles,
+  Store,
+  UserPlus,
   UserRound,
+  Users,
   UsersRound,
 } from "lucide-react";
+
 import Navbar from "../components/Navbar";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
+
+const sahayakWords = [
+  { word: "Sahayak" },
+  { word: "सहायक" },
+  { word: "সহায়ক" },
+  { word: "সহায়ক" },
+];
+
+function splitLetters(text) {
+  if (typeof Intl !== "undefined" && Intl.Segmenter) {
+    const segmenter = new Intl.Segmenter("en", { granularity: "grapheme" });
+    return Array.from(segmenter.segment(text), (item) => item.segment);
+  }
+
+  return Array.from(text);
+}
+
+function AnimatedSahayakWord() {
+  const [index, setIndex] = useState(0);
+  const [phase, setPhase] = useState("enter");
+
+  useEffect(() => {
+    let timeoutId;
+
+    const intervalId = setInterval(() => {
+      setPhase("exit");
+
+      timeoutId = setTimeout(() => {
+        setIndex((current) => (current + 1) % sahayakWords.length);
+        setPhase("enter");
+      }, 360);
+    }, 2200);
+
+    return () => {
+      clearInterval(intervalId);
+      clearTimeout(timeoutId);
+    };
+  }, []);
+
+  const activeWord = sahayakWords[index];
+  const letters = splitLetters(activeWord.word);
+
+  return (
+    <span className={`premium-sahayak-wrap ${phase}`}>
+      <span className="premium-word-glow"></span>
+
+      <span className="premium-word" key={activeWord.word}>
+        {letters.map((letter, letterIndex) => (
+          <span
+            className="premium-word-letter"
+            style={{ "--letter-index": letterIndex }}
+            key={`${letter}-${letterIndex}-${activeWord.word}`}
+          >
+            {letter}
+          </span>
+        ))}
+      </span>
+    </span>
+  );
+}
 
 function Home() {
   const { profile } = useAuth();
@@ -24,18 +98,18 @@ function Home() {
 
   function getPrimaryAction() {
     if (profile?.role === "seeker") {
-      return { label: "Browse Jobs", link: "/seeker/jobs" };
+      return { label: t("browseJobs"), link: "/seeker/jobs" };
     }
 
     if (profile?.role === "owner") {
-      return { label: "Post a Job", link: "/owner/post-job" };
+      return { label: t("postJob"), link: "/owner/post-job" };
     }
 
     if (profile?.role === "admin") {
-      return { label: "Manage System", link: "/admin/dashboard" };
+      return { label: t("manageSystem"), link: "/admin/dashboard" };
     }
 
-    return { label: "Get Started", link: "/register" };
+    return { label: t("getStarted"), link: "/register" };
   }
 
   const primaryAction = getPrimaryAction();
@@ -44,146 +118,246 @@ function Home() {
     <>
       <Navbar />
 
-      <main className="home-page">
-        <section className="home-hero">
+      <main className="home-page enhanced-home-page">
+        <section className="home-hero enhanced-home-hero">
+          <div className="hero-glow hero-glow-one"></div>
+          <div className="hero-glow hero-glow-two"></div>
+
           <div className="home-hero-content">
-            <p className="tagline">Local Job Finder System</p>
-
-            <h1>
-              Find local jobs near you with <span>Sahayak</span>
-            </h1>
-
-            <p className="home-hero-desc">
-              Sahayak connects job seekers with nearby shops and small
-              businesses. Job seekers can find local work, shop owners can post
-              vacancies, and admins can manage the complete system.
+            <p className="tagline hero-main-tag">
+              <Sparkles size={16} strokeWidth={2.7} />
+              {t("localJobFinderSystem")}
             </p>
 
-            <div className="home-actions">
-              <Link to={primaryAction.link} className="btn btn-primary">
+            <h1 className="enhanced-hero-title">
+              {t("findLocalJobsNearYouWith")} <AnimatedSahayakWord />
+            </h1>
+
+            <p className="home-hero-desc enhanced-hero-desc">
+              {t("homeDescription")}
+            </p>
+
+            <div className="home-actions enhanced-home-actions">
+              <Link
+                to={primaryAction.link}
+                className="btn btn-primary hero-primary-btn"
+              >
                 {primaryAction.label}
+                <ArrowRight size={18} strokeWidth={2.8} />
               </Link>
 
               {profile ? (
                 <Link to={getDashboardLink()} className="btn btn-light">
-                  Dashboard
+                  {t("dashboard")}
                 </Link>
               ) : (
                 <Link to="/login" className="btn btn-light">
-                  Login
+                  {t("login")}
                 </Link>
               )}
             </div>
+
+            <div className="hero-trust-row">
+              <span>
+                <MapPin size={15} strokeWidth={2.6} />
+                {t("localJobs")}
+              </span>
+
+              <span>
+                <Store size={15} strokeWidth={2.6} />
+                {t("nearbyShops")}
+              </span>
+
+              <span>
+                <Languages size={15} strokeWidth={2.6} />
+                {t("multiLanguage")}
+              </span>
+            </div>
           </div>
 
-          <div className="home-hero-panel">
-            <div className="hero-panel-top">
-              <div>
-                <p className="mini-label">Live Platform</p>
-                <h2>Core Modules</h2>
-              </div>
-
-              <span className="hero-status">Active</span>
+          <div className="enhanced-hero-panel">
+            <div className="floating-mini-card card-one">
+              <span>{t("new")}</span>
+              <strong>{t("pharmacyHelper")}</strong>
+              <p>{t("sampleSalaryLocation")}</p>
             </div>
 
-            <div className="module-chip-grid">
-              <span>Job Seeker</span>
-              <span>Shop Owner</span>
-              <span>Admin</span>
-              <span>Job Posts</span>
-              <span>Applications</span>
-              <span>Saved Jobs</span>
-              <span>Verified Shops</span>
-              <span>Supabase</span>
+            <div className="floating-mini-card card-two">
+              <span>{t("pending")}</span>
+              <strong>{t("twoApplications")}</strong>
+              <p>{t("reviewApplicantsQuickly")}</p>
+            </div>
+
+            <div className="home-hero-panel main-module-panel">
+              <div className="hero-panel-top">
+                <div>
+                  <p className="mini-label">{t("livePlatform")}</p>
+                  <h2>{t("coreModules")}</h2>
+                </div>
+
+                <span className="hero-status">{t("active")}</span>
+              </div>
+
+              <div className="module-chip-grid">
+                <span>{t("jobSeeker")}</span>
+                <span>{t("shopOwner")}</span>
+                <span>{t("admin")}</span>
+                <span>{t("jobPosts")}</span>
+                <span>{t("applications")}</span>
+                <span>{t("savedJobs")}</span>
+                <span>{t("verifiedShops")}</span>
+                <span>Jorhat</span>
+              </div>
             </div>
           </div>
         </section>
 
-        <section className="home-stats-strip">
-          <div>
-            <strong>3</strong>
-            <span>User Roles</span>
+        <section className="home-section onboarding-section">
+          <div className="home-section-head onboarding-head">
+            <p className="tagline">{t("quickSetupGuide")}</p>
+            <h2>{t("startUsingSahayak")}</h2>
+            <p>{t("startUsingSahayakDesc")}</p>
           </div>
 
-          <div>
-            <strong>7+</strong>
-            <span>Database Tables</span>
-          </div>
+          <div className="onboarding-grid">
+            <article className="onboarding-card seeker-onboarding-card">
+              <div className="onboarding-card-top">
+                <div className="onboarding-icon">
+                  <UserRound size={28} strokeWidth={2.7} />
+                </div>
 
-          <div>
-            <strong>PWA</strong>
-            <span>Mobile Ready</span>
-          </div>
-        </section>
-
-        <section className="home-section">
-          <div className="home-section-head">
-            <p className="tagline">How It Works</p>
-            <h2>Simple workflow for local hiring</h2>
-          </div>
-
-          <div className="home-role-grid">
-            <article className="home-role-card seeker-card">
-              <div className="home-role-icon">
-                <UserRound size={26} strokeWidth={2.7} />
+                <div>
+                  <p className="mini-label">{t("forJobSeekers")}</p>
+                  <h3>{t("findAndApplyJobs")}</h3>
+                </div>
               </div>
 
-              <h3>Job Seeker</h3>
-              <p>
-                Browse nearby jobs, save vacancies, apply online, and directly
-                contact shop owners.
-              </p>
+              <div className="onboarding-steps">
+                <div className="onboarding-step">
+                  <span>1</span>
+                  <div>
+                    <h4>{t("createYourAccount")}</h4>
+                    <p>{t("createYourAccountDesc")}</p>
+                  </div>
+                  <UserPlus size={22} strokeWidth={2.6} />
+                </div>
+
+                <div className="onboarding-step">
+                  <span>2</span>
+                  <div>
+                    <h4>{t("completeYourProfile")}</h4>
+                    <p>{t("completeYourProfileDesc")}</p>
+                  </div>
+                  <BadgeCheck size={22} strokeWidth={2.6} />
+                </div>
+
+                <div className="onboarding-step">
+                  <span>3</span>
+                  <div>
+                    <h4>{t("browseLocalJobs")}</h4>
+                    <p>{t("browseLocalJobsDesc")}</p>
+                  </div>
+                  <SearchCheck size={22} strokeWidth={2.6} />
+                </div>
+
+                <div className="onboarding-step">
+                  <span>4</span>
+                  <div>
+                    <h4>{t("applyAndContact")}</h4>
+                    <p>{t("applyAndContactDesc")}</p>
+                  </div>
+                  <Send size={22} strokeWidth={2.6} />
+                </div>
+              </div>
             </article>
 
-            <article className="home-role-card owner-card">
-              <div className="home-role-icon">
-                <Building2 size={26} strokeWidth={2.7} />
+            <article className="onboarding-card owner-onboarding-card">
+              <div className="onboarding-card-top">
+                <div className="onboarding-icon">
+                  <Building2 size={28} strokeWidth={2.7} />
+                </div>
+
+                <div>
+                  <p className="mini-label">{t("forShopOwners")}</p>
+                  <h3>{t("postJobsAndManageApplicants")}</h3>
+                </div>
               </div>
 
-              <h3>Shop Owner</h3>
-              <p>
-                Create a shop profile, post job vacancies, review applicants,
-                and update application status.
-              </p>
-            </article>
+              <div className="onboarding-steps">
+                <div className="onboarding-step">
+                  <span>1</span>
+                  <div>
+                    <h4>{t("createOwnerAccount")}</h4>
+                    <p>{t("createOwnerAccountDesc")}</p>
+                  </div>
+                  <UserPlus size={22} strokeWidth={2.6} />
+                </div>
 
-            <article className="home-role-card admin-card">
-              <div className="home-role-icon">
-                <ShieldCheck size={26} strokeWidth={2.7} />
+                <div className="onboarding-step">
+                  <span>2</span>
+                  <div>
+                    <h4>{t("addShopProfile")}</h4>
+                    <p>{t("addShopProfileDesc")}</p>
+                  </div>
+                  <Store size={22} strokeWidth={2.6} />
+                </div>
+
+                <div className="onboarding-step">
+                  <span>3</span>
+                  <div>
+                    <h4>{t("postAJob")}</h4>
+                    <p>{t("postAJobDesc")}</p>
+                  </div>
+                  <PlusCircle size={22} strokeWidth={2.6} />
+                </div>
+
+                <div className="onboarding-step">
+                  <span>4</span>
+                  <div>
+                    <h4>{t("reviewApplicants")}</h4>
+                    <p>{t("reviewApplicantsDesc")}</p>
+                  </div>
+                  <Users size={22} strokeWidth={2.6} />
+                </div>
               </div>
-
-              <h3>Admin</h3>
-              <p>
-                Manage users, job posts, categories, and keep the whole platform
-                organized.
-              </p>
             </article>
+          </div>
+
+          <div className="onboarding-final-note">
+            <CheckCircle2 size={20} strokeWidth={2.7} />
+            <span>{t("adminKeepsPlatformOrganized")}</span>
           </div>
         </section>
 
         <section className="home-section feature-section">
           <div className="home-section-head">
-            <p className="tagline">Project Highlights</p>
-            <h2>Built for real local job discovery</h2>
+            <p className="tagline">{t("projectHighlights")}</p>
+            <h2>{t("builtForLocalDiscovery")}</h2>
           </div>
 
           <div className="feature-grid">
             <div className="feature-card">
               <BriefcaseBusiness size={24} strokeWidth={2.7} />
-              <h3>Local Job Listings</h3>
-              <p>Jobs from nearby shops with salary, timing, location, and job type.</p>
+              <h3>{t("localJobListings")}</h3>
+              <p>{t("localJobListingsDesc")}</p>
             </div>
 
             <div className="feature-card">
               <ClipboardList size={24} strokeWidth={2.7} />
-              <h3>Application Tracking</h3>
-              <p>Seekers can track application status from pending to hired.</p>
+              <h3>{t("applicationTracking")}</h3>
+              <p>{t("applicationTrackingDesc")}</p>
             </div>
 
             <div className="feature-card">
               <UsersRound size={24} strokeWidth={2.7} />
-              <h3>Role-Based Dashboards</h3>
-              <p>Separate dashboards for seekers, shop owners, and admin users.</p>
+              <h3>{t("roleBasedDashboards")}</h3>
+              <p>{t("roleBasedDashboardsDesc")}</p>
+            </div>
+
+            <div className="feature-card">
+              <ShieldCheck size={24} strokeWidth={2.7} />
+              <h3>{t("adminControl")}</h3>
+              <p>{t("adminControlDesc")}</p>
             </div>
           </div>
         </section>
