@@ -1,4 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import ApplicationSuccessModal from "../../components/seeker/ApplicationSuccessModal";
+import { getExistingApplication } from "../../utils/jobApplications";
+
 import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -35,19 +39,24 @@ function JobDetails() {
   const [owner, setOwner] = useState(null);
   const [isSaved, setIsSaved] = useState(false);
   const [alreadyApplied, setAlreadyApplied] = useState(false);
-
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(true);
-
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState("");
   const [reportDetails, setReportDetails] = useState("");
   const [reportMessage, setReportMessage] = useState("");
-
   const [showSetupModal, setShowSetupModal] = useState(false);
   const [setupUser, setSetupUser] = useState(null);
   const [setupProfile, setSetupProfile] = useState(null);
   const [applyError, setApplyError] = useState("");
+  const [applicationSuccess, setApplicationSuccess] = useState(null);
+  const [applicationMode, setApplicationMode] = useState("new");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const navigate = useNavigate();
+  
+
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  
 
   const actionHandledRef = useRef(false);
 
@@ -341,6 +350,15 @@ ${jobUrl}`;
       return;
     }
 
+    // Check for existing application first
+    const existing = await getExistingApplication({ seekerId: loggedInUser.id, jobId: job.id });
+    if (existing) {
+      setApplicationSuccess(existing);
+      setApplicationMode("existing");
+      setShowSuccessModal(true);
+      return;
+    }
+
     const setup = await getSeekerApplySetup(loggedInUser.id);
 
     if (!setup.isComplete) {
@@ -376,21 +394,39 @@ ${jobUrl}`;
       source: "protected_job_details",
     });
 
-    const { error } = await supabase.from("applications").insert({
-      job_id: job.id,
-      seeker_id: loggedInUser.id,
-      owner_id: job.owner_id,
-      status: "pending",
-    });
-
-    if (error) {
-      console.log(error);
-      setMessage(error.message);
-      return;
+    try {
+      const { data, error } = await supabase
+        .from("applications")
+        .insert({
+          job_id: job.id,
+          seeker_id: loggedInUser.id,
+          owner_id: job.owner_id,
+          status: "pending",
+        })
+        .select()
+        .maybeSingle();
+      if (error) {
+        // Handle unique constraint violation (already applied)
+        if (error.code === "23505") {
+          const existing = await getExistingApplication({ seekerId: loggedInUser.id, jobId: job.id });
+          setApplicationSuccess(existing);
+          setApplicationMode("existing");
+          setShowSuccessModal(true);
+          return;
+        }
+        console.log(error);
+        setMessage(error.message);
+        return;
+      }
+      // Success - show modal
+      setApplicationSuccess(data);
+      setApplicationMode("new");
+      setShowSuccessModal(true);
+      setAlreadyApplied(true);
+    } catch (e) {
+      console.error(e);
+      setMessage(e.message || "Error submitting application");
     }
-
-    setAlreadyApplied(true);
-    setMessage(t("applicationSubmittedSuccess"));
   }
 
   async function handleContactClick(e, type) {
@@ -483,6 +519,15 @@ ${jobUrl}`;
   return (
     <>
       <Navbar />
+      {showSuccessModal && applicationSuccess && (
+        <ApplicationSuccessModal
+          application={applicationSuccess}
+          mode={applicationMode}
+          onClose={() => setShowSuccessModal(false)}
+          onViewApplications={() => navigate('/seeker/applications')}
+          onBrowseJobs={() => navigate('/browse-jobs')}
+        />
+      )}
 
       <main className="dashboard-section job-details-page">
         <div className="mobile-detail-topbar">
