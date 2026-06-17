@@ -120,7 +120,7 @@ function Home() {
 
       <main className="home-page enhanced-home-page">
         <section className="home-hero enhanced-home-hero">
-          <div className="hero-glow hero-glow-one"></div>
+
           <div className="hero-glow hero-glow-two"></div>
 
           <div className="home-hero-content">
@@ -323,44 +323,10 @@ function Home() {
             </article>
           </div>
 
-          <div className="onboarding-final-note">
-            <CheckCircle2 size={20} strokeWidth={2.7} />
-            <span>{t("adminKeepsPlatformOrganized")}</span>
-          </div>
+
         </section>
 
-        <section className="home-section feature-section">
-          <div className="home-section-head">
-            <p className="tagline">{t("projectHighlights")}</p>
-            <h2>{t("builtForLocalDiscovery")}</h2>
-          </div>
 
-          <div className="feature-grid">
-            <div className="feature-card">
-              <BriefcaseBusiness size={24} strokeWidth={2.7} />
-              <h3>{t("localJobListings")}</h3>
-              <p>{t("localJobListingsDesc")}</p>
-            </div>
-
-            <div className="feature-card">
-              <ClipboardList size={24} strokeWidth={2.7} />
-              <h3>{t("applicationTracking")}</h3>
-              <p>{t("applicationTrackingDesc")}</p>
-            </div>
-
-            <div className="feature-card">
-              <UsersRound size={24} strokeWidth={2.7} />
-              <h3>{t("roleBasedDashboards")}</h3>
-              <p>{t("roleBasedDashboardsDesc")}</p>
-            </div>
-
-            <div className="feature-card">
-              <ShieldCheck size={24} strokeWidth={2.7} />
-              <h3>{t("adminControl")}</h3>
-              <p>{t("adminControlDesc")}</p>
-            </div>
-          </div>
-        </section>
       </main>
     </>
   );

@@ -4133,3 +4133,1104 @@ button {
   flex: 1;
   background: #ddd5ca;
 }
+
+/* ============================= */
+/* CLEAN MOBILE-FIRST AUTH PAGES */
+/* ============================= */
+
+.auth-page {
+  min-height: 100vh;
+  padding: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.auth-shell {
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.auth-back-link {
+  width: fit-content;
+  margin-bottom: 14px;
+  text-decoration: none;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 10px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 900;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.11);
+}
+
+.clean-auth-card {
+  width: 100%;
+  border-radius: 32px;
+  padding: 34px;
+}
+
+.auth-head {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.auth-head h1 {
+  font-size: clamp(38px, 8vw, 58px);
+  line-height: 0.95;
+  letter-spacing: -2.4px;
+  margin-bottom: 10px;
+}
+
+.auth-head p {
+  color: var(--muted);
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.btn-google-auth {
+  width: 100%;
+  min-height: 52px;
+  border-radius: 999px;
+  border: 1.7px solid var(--line);
+  background: #ffffff;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 900;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.12);
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    background 0.16s ease;
+}
+
+.btn-google-auth:hover {
+  background: #fff8cc;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.14);
+}
+
+.google-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  background: #ffffff;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.google-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.auth-reassurance {
+  margin-top: 10px;
+  color: var(--muted);
+  text-align: center;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 22px 0 18px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  height: 1.5px;
+  flex: 1;
+  background: #ddd5ca;
+}
+
+.auth-form {
+  display: grid;
+  gap: 14px;
+}
+
+.field-group {
+  display: grid;
+  gap: 7px;
+}
+
+.field-group label,
+.field-label-row label {
+  font-weight: 900;
+  color: var(--text);
+}
+
+.field-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.forgot-link {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 900;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 54px;
+}
+
+.password-field button {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 36px;
+  height: 36px;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.auth-submit-btn {
+  margin-top: 4px;
+}
+
+.clean-form-bottom {
+  margin-top: 22px;
+  text-align: center;
+}
+
+/* Register role cards */
+.role-choice-grid {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.role-choice-card {
+  width: 100%;
+  border: 1.7px solid var(--line);
+  border-radius: 24px;
+  background: #ffffff;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    background 0.16s ease;
+}
+
+.role-choice-card.active {
+  background: var(--yellow);
+}
+
+.role-choice-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 0 rgba(0, 0, 0, 0.13);
+}
+
+.role-choice-icon {
+  width: 46px;
+  height: 46px;
+  border: 1.4px solid var(--line);
+  border-radius: 16px;
+  background: #ffffff;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.role-choice-card strong {
+  display: block;
+  font-size: 17px;
+  margin-bottom: 4px;
+}
+
+.role-choice-card small {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.email-toggle-button {
+  width: 100%;
+  margin-top: 14px;
+  min-height: 46px;
+  border-radius: 999px;
+  border: 1.6px solid var(--line);
+  background: #f9f7f1;
+  font-family: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .auth-page {
+    align-items: center;
+    padding: 32px;
+  }
+
+  .auth-shell {
+    max-width: 560px;
+  }
+
+  .register-auth-card {
+    max-width: 620px;
+  }
+}
+
+@media (max-width: 460px) {
+  .auth-page {
+    padding: 12px;
+  }
+
+  .clean-auth-card {
+    padding: 24px 20px;
+    border-radius: 28px;
+  }
+
+  .auth-head h1 {
+    font-size: 40px;
+    letter-spacing: -1.8px;
+  }
+
+  .auth-head p {
+    font-size: 14px;
+  }
+
+  .btn-google-auth {
+    min-height: 50px;
+    font-size: 14px;
+  }
+
+  .role-choice-card {
+    border-radius: 22px;
+    padding: 13px;
+  }
+
+  .role-choice-icon {
+    width: 42px;
+    height: 42px;
+  }
+}
+
+.forgot-link {
+  text-decoration: none;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 900;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.forgot-link:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
+/* ================================================= */
+/* MINIMAL PREMIUM AUTH UI OVERRIDE */
+/* Login / Register / Forgot / Update Password */
+/* ================================================= */
+
+.auth-page {
+  min-height: 100vh;
+  padding: 22px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top left, rgba(255, 217, 61, 0.18), transparent 32%),
+    radial-gradient(circle at bottom right, rgba(207, 237, 185, 0.25), transparent 34%),
+    #faf8f2;
+}
+
+.auth-shell {
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+.auth-back-link {
+  width: fit-content;
+  margin: 0 0 14px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  background: rgba(255, 255, 255, 0.78);
+  color: #1f2937;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 700;
+  box-shadow: none;
+  backdrop-filter: blur(10px);
+}
+
+.auth-back-link:hover {
+  background: #ffffff;
+  border-color: rgba(17, 17, 17, 0.22);
+}
+
+.auth-card.clean-auth-card {
+  width: 100%;
+  padding: 30px;
+  border-radius: 28px;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 24px 70px rgba(17, 17, 17, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.auth-head {
+  text-align: left;
+  margin-bottom: 22px;
+}
+
+.auth-head h1 {
+  font-size: 34px;
+  line-height: 1.05;
+  letter-spacing: -1.4px;
+  font-weight: 850;
+  margin: 0 0 8px;
+  color: #111111;
+}
+
+.auth-head p,
+.subtitle {
+  color: #667085;
+  font-size: 15px;
+  line-height: 1.45;
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Message box */
+.clean-auth-card .message {
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  background: #fff8cc;
+  color: #111111;
+  border-radius: 16px;
+  padding: 12px 14px;
+  font-size: 14px;
+  font-weight: 650;
+  margin-bottom: 16px;
+}
+
+/* Google button */
+.btn-google-auth {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 15px;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  background: #ffffff;
+  color: #111111;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 750;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  box-shadow: none;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.btn-google-auth:hover {
+  background: #fbfbfb;
+  border-color: rgba(17, 17, 17, 0.24);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(17, 17, 17, 0.06);
+}
+
+.btn-google-auth:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.google-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.google-icon svg {
+  width: 21px;
+  height: 21px;
+  display: block;
+}
+
+.auth-reassurance {
+  margin: 10px 0 0;
+  color: #667085;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* Divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0 18px;
+  color: #667085;
+  font-size: 12.5px;
+  font-weight: 650;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: rgba(17, 17, 17, 0.12);
+}
+
+/* Form */
+.auth-form {
+  display: grid;
+  gap: 15px;
+}
+
+.field-group {
+  display: grid;
+  gap: 7px;
+}
+
+.field-group label,
+.field-label-row label {
+  color: #111111;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.clean-auth-card input,
+.clean-auth-card select {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 15px;
+  border: 1px solid rgba(17, 17, 17, 0.14);
+  background: #ffffff;
+  color: #111111;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 0 14px;
+  outline: none;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.clean-auth-card input:focus,
+.clean-auth-card select:focus {
+  border-color: #111111;
+  box-shadow: 0 0 0 4px rgba(255, 217, 61, 0.3);
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 50px;
+}
+
+.password-field button {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  transform: translateY(-50%);
+  border: 0;
+  background: transparent;
+  color: #667085;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.password-field button:hover {
+  color: #111111;
+}
+
+.forgot-link {
+  color: #667085;
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.forgot-link:hover {
+  color: #111111;
+  text-decoration: underline;
+}
+
+/* Submit */
+.clean-auth-card .primary-btn,
+.clean-auth-card .auth-submit-btn {
+  width: 100%;
+  min-height: 50px;
+  border-radius: 15px;
+  border: 1px solid #111111;
+  background: #ffd93d;
+  color: #111111;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  box-shadow: none;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+.clean-auth-card .primary-btn:hover,
+.clean-auth-card .auth-submit-btn:hover {
+  background: #ffcf24;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(255, 217, 61, 0.28);
+}
+
+.clean-auth-card .primary-btn:active,
+.clean-auth-card .auth-submit-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Bottom links */
+.clean-form-bottom,
+.form-bottom {
+  margin-top: 20px;
+  text-align: center;
+  color: #667085;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.clean-form-bottom a,
+.form-bottom a {
+  color: #111111;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.clean-form-bottom a:hover,
+.form-bottom a:hover {
+  text-decoration: underline;
+}
+
+/* Register role cards */
+.role-choice-grid {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.role-choice-card {
+  width: 100%;
+  min-height: 76px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  text-align: left;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: none;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.role-choice-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(17, 17, 17, 0.22);
+  box-shadow: 0 10px 24px rgba(17, 17, 17, 0.05);
+}
+
+.role-choice-card.active {
+  background: #fff9db;
+  border-color: #e8bd00;
+  box-shadow: 0 0 0 4px rgba(255, 217, 61, 0.22);
+}
+
+.role-choice-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  background: #ffffff;
+  color: #111111;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.role-choice-card strong {
+  display: block;
+  color: #111111;
+  font-size: 15.5px;
+  font-weight: 800;
+  margin-bottom: 3px;
+}
+
+.role-choice-card small {
+  display: block;
+  color: #667085;
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+/* Email toggle */
+.email-toggle-button {
+  width: 100%;
+  min-height: 46px;
+  margin-top: 14px;
+  border-radius: 15px;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  background: #f8f6ef;
+  color: #111111;
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 750;
+  cursor: pointer;
+  box-shadow: none;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.email-toggle-button:hover {
+  background: #ffffff;
+  border-color: rgba(17, 17, 17, 0.22);
+}
+
+/* Desktop */
+@media (min-width: 768px) {
+  .auth-shell {
+    max-width: 460px;
+  }
+
+  .register-auth-card {
+    max-width: 500px;
+  }
+}
+
+/* Mobile-first polish */
+@media (max-width: 520px) {
+  .auth-page {
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 14px;
+  }
+
+  .auth-shell {
+    max-width: 100%;
+  }
+
+  .auth-back-link {
+    margin-bottom: 12px;
+    padding: 8px 11px;
+    font-size: 13.5px;
+  }
+
+  .auth-card.clean-auth-card {
+    padding: 24px 18px;
+    border-radius: 24px;
+    box-shadow: 0 16px 45px rgba(17, 17, 17, 0.07);
+  }
+
+  .auth-head {
+    margin-bottom: 18px;
+  }
+
+  .auth-head h1 {
+    font-size: 30px;
+    letter-spacing: -1px;
+  }
+
+  .auth-head p {
+    font-size: 14px;
+  }
+
+  .btn-google-auth {
+    min-height: 47px;
+    border-radius: 14px;
+    font-size: 14px;
+  }
+
+  .clean-auth-card input,
+  .clean-auth-card select {
+    min-height: 47px;
+    border-radius: 14px;
+  }
+
+  .role-choice-card {
+    min-height: 72px;
+    border-radius: 16px;
+    padding: 13px;
+  }
+
+  .role-choice-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 13px;
+  }
+
+  .role-choice-card strong {
+    font-size: 15px;
+  }
+
+  .role-choice-card small {
+    font-size: 12.5px;
+  }
+}
+
+/* ================================================= */
+/* GLOBAL MINIMAL TYPOGRAPHY + UI SOFTENING OVERRIDE */
+/* Makes full website less bold and more polished */
+/* ================================================= */
+
+/* Better default text rendering */
+body {
+  color: #111111;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Headings: strong but not cartoon-heavy */
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 780 !important;
+  letter-spacing: -0.04em;
+}
+
+h1 {
+  font-size: clamp(34px, 5vw, 64px);
+  line-height: 0.98;
+}
+
+h2 {
+  font-size: clamp(26px, 3.5vw, 42px);
+  line-height: 1.05;
+}
+
+h3 {
+  font-size: clamp(19px, 2vw, 26px);
+  line-height: 1.15;
+}
+
+h4 {
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+/* Paragraphs and descriptions */
+p,
+li,
+span,
+small {
+  font-weight: 500;
+}
+
+p,
+.job-desc,
+.mobile-job-desc,
+.dashboard-card p,
+.stat-card p,
+.mobile-empty-state p,
+.mobile-detail-section p,
+.home-hero-desc,
+.home-role-card p,
+.feature-card p,
+.onboarding-step p,
+.onboarding-head p:not(.tagline) {
+  color: #5f6673 !important;
+  font-weight: 500 !important;
+  line-height: 1.6;
+}
+
+/* Labels should be readable, not super heavy */
+label,
+.field-group label,
+.field-label-row label {
+  font-weight: 650 !important;
+}
+
+/* Buttons: confident but less loud */
+button,
+.btn,
+.primary-btn,
+.nav-pill,
+.logout-pill,
+.mobile-nav-item,
+.email-toggle-button,
+.btn-google-auth {
+  font-weight: 720 !important;
+}
+
+/* Pills/tags: lighter and cleaner */
+.tagline,
+.mini-tagline,
+.status-badge,
+.hero-status,
+.mini-label,
+.module-chip-grid span,
+.tiny-verified,
+.verified-badge,
+.language-option,
+.language-short {
+  font-weight: 720 !important;
+  letter-spacing: -0.01em;
+}
+
+/* Main brand can stay bold but not too much */
+.brand-text {
+  font-weight: 820 !important;
+}
+
+/* Dashboard hero titles */
+.dashboard-header h1,
+.mobile-hero-clean h1,
+.admin-mobile-hero h1,
+.owner-mobile-hero h1 {
+  font-weight: 800 !important;
+  letter-spacing: -0.045em;
+}
+
+/* Stats: still prominent but less aggressive */
+.stat-card h3,
+.mobile-stat-chip strong,
+.home-stats-strip strong {
+  font-weight: 800 !important;
+  letter-spacing: -0.04em;
+}
+
+/* Cards: softer borders and shadows */
+.dashboard-card,
+.job-card,
+.applicant-card,
+.stat-card,
+.admin-panel-card,
+.admin-list-item,
+.mobile-info-section,
+.mobile-job-card,
+.details-card,
+.home-section,
+.home-hero,
+.home-hero-panel,
+.onboarding-card,
+.feature-card,
+.home-role-card {
+  border-width: 1px !important;
+  box-shadow: 0 18px 45px rgba(17, 17, 17, 0.06) !important;
+}
+
+/* Heavy outlines softened */
+.navbar,
+.app-topbar,
+.mobile-bottom-nav,
+.role-choice-card,
+.mobile-list-row,
+.mobile-detail-pill,
+.mobile-alert-card,
+.mobile-stat-chip,
+.category-item,
+.admin-job-card {
+  border-width: 1px !important;
+}
+
+/* Inputs more premium */
+input,
+select,
+textarea {
+  font-weight: 500 !important;
+  border-width: 1px !important;
+}
+
+/* Softer yellow buttons */
+.primary-btn,
+.btn-primary {
+  background: #ffd93d;
+  font-weight: 760 !important;
+  box-shadow: none !important;
+}
+
+.primary-btn:hover,
+.btn-primary:hover {
+  background: #ffcf24;
+  box-shadow: 0 10px 24px rgba(255, 217, 61, 0.25) !important;
+}
+
+/* Light buttons should not look too heavy */
+.btn-light {
+  background: #ffffff;
+  border-width: 1px !important;
+  box-shadow: none !important;
+}
+
+/* Navigation cleaner */
+.nav-pill {
+  box-shadow: none !important;
+  border-width: 1px !important;
+}
+
+.nav-pill.active {
+  background: #fff4b8;
+}
+
+/* Bottom nav cleaner */
+.mobile-bottom-nav {
+  box-shadow: 0 14px 36px rgba(17, 17, 17, 0.1) !important;
+}
+
+.mobile-nav-item small {
+  font-weight: 650 !important;
+}
+
+/* Language toggle cleaner */
+.language-toggle {
+  box-shadow: none !important;
+  font-weight: 720 !important;
+}
+
+/* Tables/lists/admin items */
+.admin-list-item h3,
+.mobile-list-row h3,
+.mobile-job-card h3,
+.job-card h3,
+.applicant-card h3 {
+  font-weight: 760 !important;
+}
+
+/* Home page hero: keep impressive but smoother */
+.enhanced-hero-title,
+.home-hero h1 {
+  font-weight: 820 !important;
+  letter-spacing: -0.055em;
+}
+
+.premium-word,
+.premium-word-letter {
+  font-weight: 820 !important;
+}
+
+/* Onboarding cards clean */
+.onboarding-card-top h3,
+.home-section-head h2 {
+  font-weight: 780 !important;
+}
+
+.onboarding-step h4 {
+  font-weight: 720 !important;
+}
+
+/* Mobile-specific softness */
+@media (max-width: 760px) {
+  h1 {
+    font-size: clamp(30px, 10vw, 42px);
+  }
+
+  h2 {
+    font-size: clamp(24px, 7vw, 32px);
+  }
+
+  .dashboard-header h1,
+  .mobile-hero-clean h1,
+  .browse-mobile-header h1,
+  .saved-mobile-header h1,
+  .mobile-job-detail-head h1 {
+    font-size: clamp(30px, 9vw, 38px) !important;
+    font-weight: 790 !important;
+  }
+
+  .dashboard-card,
+  .job-card,
+  .mobile-job-card,
+  .mobile-info-section,
+  .home-section,
+  .home-hero,
+  .onboarding-card {
+    box-shadow: 0 12px 30px rgba(17, 17, 17, 0.055) !important;
+  }
+
+  .btn,
+  .primary-btn,
+  .btn-primary,
+  .btn-light {
+    font-weight: 720 !important;
+  }
+}

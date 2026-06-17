@@ -21,6 +21,8 @@ import Home from "./pages/Home";
 import AuthCallback from "./pages/AuthCallback";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import UpdatePassword from "./pages/UpdatePassword";
 
 
 
@@ -324,6 +326,8 @@ function App() {
       <Route path="/auth/callback" element={<AuthCallback />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/update-password" element={<UpdatePassword />} />
 
       <Route
         path="/dashboard"
