@@ -29,36 +29,51 @@ function AuthCallback() {
             user.email?.split("@")[0] ||
             "Sahayak User";
 
-        const { data: existingProfile } = await supabase
+        const { data: existingProfile, error: profileError } = await supabase
             .from("profiles")
             .select("*")
             .eq("id", user.id)
             .maybeSingle();
 
+        if (profileError) {
+            console.log(profileError);
+            navigate("/login");
+            return;
+        }
+
+        let finalRole = selectedRole;
+
         if (!existingProfile) {
-            await supabase.from("profiles").insert({
+            const { error: insertError } = await supabase.from("profiles").insert({
                 id: user.id,
                 name,
                 email: user.email,
                 phone: "",
                 role: selectedRole,
             });
-        } else if (!existingProfile.role || existingProfile.role === "seeker") {
+
+            if (insertError) {
+                console.log(insertError);
+                navigate("/login");
+                return;
+            }
+        } else {
+            finalRole = existingProfile.role;
+
             await supabase
                 .from("profiles")
                 .update({
                     name: existingProfile.name || name,
                     email: existingProfile.email || user.email,
-                    role: selectedRole,
                 })
                 .eq("id", user.id);
         }
 
         localStorage.removeItem("sahayak_google_role");
 
-        if (selectedRole === "owner") {
+        if (finalRole === "owner") {
             navigate("/owner/dashboard");
-        } else if (selectedRole === "admin") {
+        } else if (finalRole === "admin") {
             navigate("/admin/dashboard");
         } else {
             navigate("/seeker/dashboard");
@@ -66,11 +81,10 @@ function AuthCallback() {
     }
 
     return (
-        <main className="dashboard-section">
-            <div className="dashboard-header">
-                <p className="tagline">Google Login</p>
+        <main className="page-center">
+            <div className="auth-card">
                 <h1>Completing sign in...</h1>
-                <p>Please wait while we prepare your Sahayak account.</p>
+                <p className="subtitle">Please wait while we prepare your account.</p>
             </div>
         </main>
     );

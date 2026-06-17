@@ -4100,3 +4100,36 @@ button {
   height: 22px;
   display: block;
 }
+
+/* REGISTER GOOGLE AUTH BUTTONS */
+.google-auth-box {
+  margin: 18px 0 14px;
+  display: grid;
+  gap: 11px;
+}
+
+.google-owner-button {
+  background: #fff8cc;
+}
+
+.google-owner-button:hover {
+  background: #ffd93d;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0 16px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  height: 1.5px;
+  flex: 1;
+  background: #ddd5ca;
+}
