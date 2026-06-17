@@ -181,6 +181,12 @@ function AdminDashboard() {
                 <p>{t("shopVerificationToolDesc")}</p>
                 <span>{t("reviewShops")}</span>
               </Link>
+
+              <Link to="/admin/analytics" className="admin-tool-card">
+                <h3>{t("adminAnalytics")}</h3>
+                <p>{t("adminAnalyticsToolDesc")}</p>
+                <span>{t("viewAnalytics")}</span>
+              </Link>
             </div>
           </section>
 
@@ -267,6 +273,16 @@ function AdminDashboard() {
               <div>
                 <h3>{t("shopVerification")}</h3>
                 <p>{t("shopVerificationToolDesc")}</p>
+              </div>
+            </Link>
+
+            <Link
+              to="/admin/analytics"
+              className="mobile-list-row admin-tool-row"
+            >
+              <div>
+                <h3>{t("adminAnalytics")}</h3>
+                <p>{t("adminAnalyticsToolDesc")}</p>
               </div>
             </Link>
           </div>

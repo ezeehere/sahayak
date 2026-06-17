@@ -1,8 +1,14 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Building2, Eye, EyeOff, UserRound } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useLanguage } from "../context/LanguageContext";
+import {
+  getAuthContextKeys,
+  getDefaultRoleForAuthContext,
+  getJobAuthContextFromUrl,
+  persistJobAuthContextFromUrl,
+} from "../utils/authJobContext";
 
 function GoogleIcon() {
   return (
@@ -45,7 +51,21 @@ function Register() {
   const { t } = useLanguage();
   const navigate = useNavigate();
 
-  const [selectedRole, setSelectedRole] = useState("seeker");
+  const jobAuthContext = useMemo(() => getJobAuthContextFromUrl(), []);
+  const authContextKeys = jobAuthContext ? getAuthContextKeys(jobAuthContext.action) : null;
+
+  useEffect(() => {
+    persistJobAuthContextFromUrl();
+  }, []);
+
+  const defaultRole = useMemo(() => {
+    if (jobAuthContext?.action) {
+      return getDefaultRoleForAuthContext(jobAuthContext.action) || "seeker";
+    }
+    return "seeker";
+  }, [jobAuthContext]);
+
+  const [selectedRole, setSelectedRole] = useState(defaultRole);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -54,7 +74,7 @@ function Register() {
     email: "",
     phone: "",
     password: "",
-    role: "seeker",
+    role: defaultRole,
   });
 
   const [message, setMessage] = useState("");
@@ -68,7 +88,7 @@ function Register() {
     e.preventDefault();
     setMessage(t("creatingAccount"));
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
       options: {
@@ -88,7 +108,11 @@ function Register() {
     setMessage(t("accountCreatedSuccess"));
 
     setTimeout(() => {
-      navigate("/login");
+      if (data?.session) {
+        window.location.replace("/smart-entry");
+      } else {
+        navigate(`/login${jobAuthContext?.query || ""}`);
+      }
     }, 900);
   }
 
@@ -124,6 +148,17 @@ function Register() {
             <p>{t("chooseRoleToContinue")}</p>
           </div>
 
+          {authContextKeys && (
+            <div className="message" style={{ backgroundColor: "var(--blue)", border: "1.5px solid var(--line)", color: "var(--text)", textAlign: "left" }}>
+              <strong style={{ display: "block", marginBottom: "4px" }}>
+                {t(authContextKeys.titleKey) || authContextKeys.defaultTitle}
+              </strong>
+              <span style={{ fontSize: "13px", lineHeight: "1.4", display: "block" }}>
+                {t(authContextKeys.bodyKey) || authContextKeys.defaultBody}
+              </span>
+            </div>
+          )}
+
           {message && <div className="message">{message}</div>}
 
           <div className="role-choice-grid">
@@ -146,24 +181,26 @@ function Register() {
               </span>
             </button>
 
-            <button
-              type="button"
-              className={
-                selectedRole === "owner"
-                  ? "role-choice-card active"
-                  : "role-choice-card"
-              }
-              onClick={() => changeRole("owner")}
-            >
-              <span className="role-choice-icon">
-                <Building2 size={23} strokeWidth={2.7} />
-              </span>
+            {jobAuthContext?.action !== "apply" && (
+              <button
+                type="button"
+                className={
+                  selectedRole === "owner"
+                    ? "role-choice-card active"
+                    : "role-choice-card"
+                }
+                onClick={() => changeRole("owner")}
+              >
+                <span className="role-choice-icon">
+                  <Building2 size={23} strokeWidth={2.7} />
+                </span>
 
-              <span>
-                <strong>{t("shopOwner")}</strong>
-                <small>{t("shopOwnerRoleDesc")}</small>
-              </span>
-            </button>
+                <span>
+                  <strong>{t("shopOwner")}</strong>
+                  <small>{t("shopOwnerRoleDesc")}</small>
+                </span>
+              </button>
+            )}
           </div>
 
           <button
@@ -275,7 +312,7 @@ function Register() {
           )}
 
           <p className="form-bottom clean-form-bottom">
-            {t("alreadyRegistered")} <Link to="/login">{t("login")}</Link>
+            {t("alreadyRegistered")} <Link to={`/login${jobAuthContext?.query || ""}`}>{t("login")}</Link>
           </p>
         </div>
       </section>

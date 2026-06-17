@@ -97,7 +97,7 @@ function MyApplications() {
             <h3>{t("noApplicationsYet")}</h3>
             <p>{t("browseAndApplyMsg")}</p>
 
-            <Link to="/seeker/jobs" className="btn btn-primary">
+            <Link to="/browse-jobs" className="btn btn-primary">
               {t("browseJobs")}
             </Link>
           </div>
@@ -121,9 +121,9 @@ function MyApplications() {
                   </div>
 
                   <p className="shop-name">
-                    {job.shop_profiles?.shop_name || t("localShop")}
+                    {job.shop_profiles?.shop_name || job.offline_shop_name || t("localShop")}
 
-                    {job.shop_profiles?.is_verified && (
+                    {(job.shop_profiles?.is_verified || job.offline_shop_verified) && (
                       <span className="verified-badge">{t("verified")}</span>
                     )}
                   </p>
@@ -159,7 +159,7 @@ function MyApplications() {
 
                   <div className="job-actions">
                     <Link
-                      to={`/seeker/jobs/${job.id}`}
+                      to={`/jobs/${job.id}`}
                       className="btn btn-primary"
                     >
                       {t("viewJob")}

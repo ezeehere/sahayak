@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -21,6 +21,10 @@ import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import Navbar from "../../components/Navbar";
 import JobSafetyNotice from "../../components/JobSafetyNotice";
+import { trackJobEvent } from "../../utils/jobEvents";
+import { requireLoginForJobAction } from "../../utils/jobActionGate";
+import { getSeekerApplySetup } from "../../utils/seekerApplySetup";
+import MinimalApplySetupModal from "../../components/seeker/MinimalApplySetupModal";
 
 function JobDetails() {
   const { id } = useParams();
@@ -40,13 +44,21 @@ function JobDetails() {
   const [reportDetails, setReportDetails] = useState("");
   const [reportMessage, setReportMessage] = useState("");
 
+  const [showSetupModal, setShowSetupModal] = useState(false);
+  const [setupUser, setSetupUser] = useState(null);
+  const [setupProfile, setSetupProfile] = useState(null);
+  const [applyError, setApplyError] = useState("");
+
+  const actionHandledRef = useRef(false);
+
   async function submitJobReport(e) {
     e.preventDefault();
 
-    if (!user?.id || !job?.id) {
-      setReportMessage(t("pleaseLoginAgain"));
-      return;
-    }
+    const loggedInUser = await requireLoginForJobAction({
+      type: "report",
+      jobId: job.id,
+    });
+    if (!loggedInUser) return;
 
     if (!reportReason) {
       setReportMessage(t("pleaseSelectReason"));
@@ -82,6 +94,32 @@ function JobDetails() {
     return job?.shop_profiles?.shop_name || job?.offline_shop_name || t("localShop");
   }
 
+  function getShopAddress() {
+    return (
+      job?.shop_profiles?.address ||
+      job?.offline_shop_address ||
+      job?.location ||
+      t("notAvailable")
+    );
+  }
+
+  function getShopCategory() {
+    return (
+      job?.shop_profiles?.category ||
+      job?.offline_shop_category ||
+      job?.category ||
+      t("notAvailable")
+    );
+  }
+
+  function getShopPhone() {
+    return job?.offline_shop_phone || owner?.phone || t("notAvailable");
+  }
+
+  function isVerifiedJob() {
+    return job?.shop_profiles?.is_verified || job?.offline_shop_verified;
+  }
+
   function getShareText() {
     const jobUrl = `${window.location.origin}/jobs/${job.id}`;
 
@@ -103,14 +141,45 @@ ${jobUrl}`;
     const text = getShareText();
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
 
+    trackJobEvent({
+      jobId: job.id,
+      userId: user?.id || null,
+      eventType: "job_share",
+      source: "protected_job_details",
+    });
+
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
   }
 
   useEffect(() => {
-    if (user?.id && id) {
+    if (id) {
       fetchJobDetails();
     }
-  }, [user, id]);
+  }, [user?.id, id]);
+
+  useEffect(() => {
+    if (!loading && job && !actionHandledRef.current) {
+      const params = new URLSearchParams(window.location.search);
+      const action = params.get("action");
+
+      if (action) {
+        actionHandledRef.current = true;
+
+        const url = new URL(window.location);
+        url.searchParams.delete("action");
+        url.searchParams.delete("job");
+        window.history.replaceState({}, document.title, url.pathname);
+
+        if (action === "apply") {
+          startApplyFlow();
+        } else if (action === "save") {
+          if (!isSaved) {
+            toggleSavedJob();
+          }
+        }
+      }
+    }
+  }, [loading, job]);
 
   async function fetchJobDetails() {
     setLoading(true);
@@ -149,6 +218,15 @@ ${jobUrl}`;
 
     setJob(jobData);
 
+    if (jobData?.id) {
+      trackJobEvent({
+        jobId: jobData.id,
+        userId: user?.id || null,
+        eventType: "job_view",
+        source: "protected_job_details",
+      });
+    }
+
     const { data: ownerData, error: ownerError } = await supabase
       .from("profiles")
       .select("id, name, email, phone")
@@ -159,36 +237,47 @@ ${jobUrl}`;
       setOwner(ownerData);
     }
 
-    const { data: savedData } = await supabase
-      .from("saved_jobs")
-      .select("id")
-      .eq("job_id", id)
-      .eq("seeker_id", user.id)
-      .maybeSingle();
+    if (user?.id) {
+      const { data: savedData } = await supabase
+        .from("saved_jobs")
+        .select("id")
+        .eq("job_id", id)
+        .eq("seeker_id", user.id)
+        .maybeSingle();
 
-    setIsSaved(!!savedData);
+      setIsSaved(!!savedData);
 
-    const { data: applicationData } = await supabase
-      .from("applications")
-      .select("id")
-      .eq("job_id", id)
-      .eq("seeker_id", user.id)
-      .maybeSingle();
+      const { data: applicationData } = await supabase
+        .from("applications")
+        .select("id")
+        .eq("job_id", id)
+        .eq("seeker_id", user.id)
+        .maybeSingle();
 
-    setAlreadyApplied(!!applicationData);
+      setAlreadyApplied(!!applicationData);
+    } else {
+      setIsSaved(false);
+      setAlreadyApplied(false);
+    }
 
     setLoading(false);
   }
 
   async function toggleSavedJob() {
-    if (!job || !user?.id) return;
+    if (!job) return;
+
+    const loggedInUser = await requireLoginForJobAction({
+      type: "save",
+      jobId: job.id,
+    });
+    if (!loggedInUser) return;
 
     if (isSaved) {
       const { error } = await supabase
         .from("saved_jobs")
         .delete()
         .eq("job_id", job.id)
-        .eq("seeker_id", user.id);
+        .eq("seeker_id", loggedInUser.id);
 
       if (error) {
         console.log(error);
@@ -201,7 +290,7 @@ ${jobUrl}`;
     } else {
       const { error } = await supabase.from("saved_jobs").insert({
         job_id: job.id,
-        seeker_id: user.id,
+        seeker_id: loggedInUser.id,
       });
 
       if (error) {
@@ -215,8 +304,63 @@ ${jobUrl}`;
     }
   }
 
+  async function getCurrentUserProfile(userId) {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id, role, name, phone, area, short_intro")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Profile check failed:", error.message);
+      return null;
+    }
+
+    return data;
+  }
+
+  async function startApplyFlow() {
+    setApplyError("");
+
+    const loggedInUser = await requireLoginForJobAction({
+      type: "apply",
+      jobId: job.id,
+    });
+
+    if (!loggedInUser) return;
+
+    const profileData = await getCurrentUserProfile(loggedInUser.id);
+
+    if (!profileData) {
+      setApplyError("Could not find your profile. Please try logging in again.");
+      return;
+    }
+
+    if (profileData.role !== "seeker") {
+      setApplyError("Only job seekers can apply for jobs.");
+      return;
+    }
+
+    const setup = await getSeekerApplySetup(loggedInUser.id);
+
+    if (!setup.isComplete) {
+      setSetupUser(loggedInUser);
+      setSetupProfile(setup.profile);
+      setShowSetupModal(true);
+      return;
+    }
+
+    applyJob();
+  }
+
   async function applyJob() {
-    if (!job || !user?.id) return;
+    if (!job) return;
+
+    const loggedInUser = await requireLoginForJobAction({
+      type: "apply",
+      jobId: job.id,
+    });
+    if (!loggedInUser) return;
 
     if (alreadyApplied) {
       setMessage(t("alreadyAppliedMessage"));
@@ -225,9 +369,16 @@ ${jobUrl}`;
 
     setMessage(t("submittingApplication"));
 
+    trackJobEvent({
+      jobId: job.id,
+      userId: loggedInUser.id,
+      eventType: "apply_click",
+      source: "protected_job_details",
+    });
+
     const { error } = await supabase.from("applications").insert({
       job_id: job.id,
-      seeker_id: user.id,
+      seeker_id: loggedInUser.id,
       owner_id: job.owner_id,
       status: "pending",
     });
@@ -240,6 +391,34 @@ ${jobUrl}`;
 
     setAlreadyApplied(true);
     setMessage(t("applicationSubmittedSuccess"));
+  }
+
+  async function handleContactClick(e, type) {
+    if (!user) {
+      e.preventDefault();
+      await requireLoginForJobAction({
+        type: "contact",
+        jobId: job.id,
+      });
+      return;
+    }
+
+    trackJobEvent({
+      jobId: job.id,
+      userId: user.id,
+      eventType: type === "call" ? "call_click" : "whatsapp_click",
+      source: "protected_job_details",
+    });
+  }
+
+  async function handleReportClick() {
+    const loggedInUser = await requireLoginForJobAction({
+      type: "report",
+      jobId: job.id,
+    });
+    if (!loggedInUser) return;
+
+    setShowReportModal(true);
   }
 
   function getCleanPhone(phone) {
@@ -266,7 +445,7 @@ ${jobUrl}`;
 
   const callLink = cleanPhone ? `tel:+${cleanPhone}` : "#";
 
-  if (!user?.id || loading) {
+  if (loading) {
     return (
       <>
         <Navbar />
@@ -292,7 +471,7 @@ ${jobUrl}`;
             <h3>{t("jobNotFound")}</h3>
             <p>{message || t("jobNotFoundDesc")}</p>
 
-            <Link to="/seeker/jobs" className="btn btn-primary">
+            <Link to="/browse-jobs" className="btn btn-primary">
               {t("backToJobs")}
             </Link>
           </div>
@@ -307,7 +486,7 @@ ${jobUrl}`;
 
       <main className="dashboard-section job-details-page">
         <div className="mobile-detail-topbar">
-          <Link to="/seeker/jobs" className="mobile-back-link">
+          <Link to="/browse-jobs" className="mobile-back-link">
             <ArrowLeft size={18} strokeWidth={2.8} />
             <span>{t("back")}</span>
           </Link>
@@ -336,7 +515,7 @@ ${jobUrl}`;
               <Store size={15} strokeWidth={2.6} />
               <span>{getShopName()}</span>
 
-              {(job.shop_profiles?.is_verified || job.offline_shop_verified) && (
+              {isVerifiedJob() && (
                 <span className="tiny-verified">{t("verified")}</span>
               )}
             </p>
@@ -381,12 +560,18 @@ ${jobUrl}`;
           <JobSafetyNotice />
 
           <div className="mobile-main-actions">
+            {applyError && (
+              <div className="setup-error" style={{ width: "100%", gridColumn: "span 2", marginBottom: "12px" }}>
+                {applyError}
+              </div>
+            )}
+
             {alreadyApplied ? (
               <button className="btn btn-disabled" disabled>
                 {t("alreadyApplied")}
               </button>
             ) : (
-              <button className="btn btn-primary" onClick={applyJob}>
+              <button className="btn btn-primary" onClick={startApplyFlow}>
                 {t("applyNow")}
               </button>
             )}
@@ -404,15 +589,31 @@ ${jobUrl}`;
               <a
                 href={cleanPhone ? `tel:${cleanPhone}` : undefined}
                 className="btn call-owner-btn"
+                onClick={(e) => handleContactClick(e, "call")}
               >
                 <Phone size={17} strokeWidth={2.7} />
                 {t("callOwner")}
               </a>
 
+              {cleanPhone && (
+                <a
+                  href={whatsappLink}
+                  target={user ? "_blank" : undefined}
+                  rel={user ? "noopener noreferrer" : undefined}
+                  className="btn whatsapp-contact-btn"
+                  onClick={(e) => handleContactClick(e, "whatsapp")}
+                  style={{ backgroundColor: "#25D366", color: "#ffffff", borderColor: "#25D366" }}
+                >
+                  <MessageCircle size={17} strokeWidth={2.7} />
+                  WhatsApp
+                </a>
+              )}
+
               <button
                 type="button"
                 className="btn report-job-btn"
-                onClick={() => setShowReportModal(true)}
+                onClick={handleReportClick}
+                style={cleanPhone ? { gridColumn: "span 2" } : {}}
               >
                 <Flag size={17} strokeWidth={2.7} />
                 {t("report")}
@@ -425,45 +626,66 @@ ${jobUrl}`;
             <p>{job.description}</p>
           </section>
 
-          <section className="mobile-detail-section">
-            <h3>{t("shopInformation")}</h3>
+          <div className="mobile-detail-section shop-detail-box">
+            <h2>{t("shopDetails")}</h2>
 
-            <div className="mobile-info-list">
-              <p>
-                <strong>{t("shopName")}:</strong>{" "}
-                {job.shop_profiles?.shop_name || t("notAvailable")}
-              </p>
+            <div className="shop-detail-grid">
+              <div>
+                <strong>{t("shopName")}</strong>
+                <p>{getShopName()}</p>
+              </div>
 
-              <p>
-                <strong>{t("shopAddress")}:</strong>{" "}
-                {job.shop_profiles?.address || t("notAvailable")}
-              </p>
+              <div>
+                <strong>{t("shopCategory")}</strong>
+                <p>{getShopCategory()}</p>
+              </div>
 
-              <p>
-                <strong>{t("openingTime")}:</strong>{" "}
-                {job.shop_profiles?.opening_time || t("notMentioned")}
-              </p>
+              <div>
+                <strong>{t("shopAddress")}</strong>
+                <p>{getShopAddress()}</p>
+              </div>
 
-              <p>
-                <strong>{t("closingTime")}:</strong>{" "}
-                {job.shop_profiles?.closing_time || t("notMentioned")}
-              </p>
+              {user && (
+                <div>
+                  <strong>{t("phone")}</strong>
+                  <p>{getShopPhone()}</p>
+                </div>
+              )}
             </div>
-          </section>
+
+            {isVerifiedJob() && (
+              <div className="verified-shop-note">
+                {t("verifiedShopTrustNote")}
+              </div>
+            )}
+          </div>
 
           <section className="mobile-detail-section">
             <h3>{t("ownerContact")}</h3>
 
-            <div className="mobile-info-list">
-              <p>
-                <strong>{t("name")}:</strong> {owner?.name || t("notAvailable")}
-              </p>
+            {user ? (
+              <div className="mobile-info-list">
+                <p>
+                  <strong>{t("name")}:</strong> {owner?.name || t("notAvailable")}
+                </p>
 
-              <p>
-                <strong>{t("phone")}:</strong>{" "}
-                {job.offline_shop_phone || owner?.phone || t("notAvailable")}
-              </p>
-            </div>
+                <p>
+                  <strong>{t("phone")}:</strong>{" "}
+                  {job.offline_shop_phone || owner?.phone || t("notAvailable")}
+                </p>
+              </div>
+            ) : (
+              <div className="blur-contact-section">
+                <p className="contact-locked-msg">{t("loginToViewContact")}</p>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => requireLoginForJobAction({ type: "contact", jobId: job.id })}
+                >
+                  {t("showContactInfo")}
+                </button>
+              </div>
+            )}
           </section>
         </article>
 
@@ -525,6 +747,18 @@ ${jobUrl}`;
               </form>
             </div>
           </div>
+        )}
+
+        {showSetupModal && setupUser && (
+          <MinimalApplySetupModal
+            user={setupUser}
+            profile={setupProfile}
+            onClose={() => setShowSetupModal(false)}
+            onComplete={() => {
+              setShowSetupModal(false);
+              applyJob();
+            }}
+          />
         )}
       </main>
     </>

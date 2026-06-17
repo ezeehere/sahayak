@@ -96,7 +96,7 @@ function Home() {
 
   function getPrimaryAction() {
     if (profile?.role === "seeker") {
-      return { label: t("browseJobs"), link: "/seeker/jobs" };
+      return { label: t("browseJobs"), link: "/browse-jobs" };
     }
 
     if (profile?.role === "owner") {

@@ -16,6 +16,8 @@ import JobSafetyNotice from "../components/JobSafetyNotice";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
+import { trackJobEvent } from "../utils/jobEvents";
+import { savePendingJobAction } from "../utils/pendingJobAction";
 
 function PublicJobDetails() {
   const { id } = useParams();
@@ -70,6 +72,14 @@ function PublicJobDetails() {
     }
 
     setJob(data || null);
+    if (data?.id) {
+      trackJobEvent({
+        jobId: data.id,
+        userId: user?.id || null,
+        eventType: "job_view",
+        source: "public_job_page",
+      });
+    }
     setLoading(false);
   }
 
@@ -79,6 +89,10 @@ function PublicJobDetails() {
 
   function getShopAddress() {
     return job?.shop_profiles?.address || job?.offline_shop_address || job?.location;
+  }
+
+  function getShopCategory() {
+    return job?.shop_profiles?.category || job?.offline_shop_category || job?.category;
   }
 
   function isVerifiedJob() {
@@ -103,16 +117,42 @@ ${jobUrl}`;
   function shareJobOnWhatsApp() {
     if (!job) return;
 
+    trackJobEvent({
+      jobId: job.id,
+      userId: user?.id || null,
+      eventType: "job_share",
+      source: "public_job_page",
+    });
+
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(getShareText())}`;
     window.open(whatsappUrl, "_blank", "noopener,noreferrer");
   }
 
   function getApplyLink() {
     if (user && profile?.role === "seeker") {
-      return `/seeker/jobs/${job.id}`;
+      return `/jobs/${job.id}`;
     }
 
-    return `/login?redirect=/seeker/jobs/${job.id}`;
+    return `/login?redirect=/jobs/${job.id}`;
+  }
+
+  function handleApplyClick(e) {
+    if (!user) {
+      e.preventDefault();
+      savePendingJobAction({
+        type: "apply",
+        jobId: job.id,
+        returnTo: `/jobs/${job.id}`,
+      });
+      window.location.href = "/login";
+    } else {
+      trackJobEvent({
+        jobId: job.id,
+        userId: user.id,
+        eventType: "apply_click",
+        source: "public_job_page",
+      });
+    }
   }
 
   if (loading) {
@@ -223,14 +263,26 @@ ${jobUrl}`;
             </div>
 
             <div className="public-job-section">
-              <h2>{t("shopLocation")}</h2>
-              <p>{getShopAddress()}</p>
+              <h2>{t("shopDetails")}</h2>
+              <p>
+                <strong>{t("shopName")}:</strong> {getShopName()}
+              </p>
+              <p>
+                <strong>{t("shopCategory")}:</strong> {getShopCategory()}
+              </p>
+              <p>
+                <strong>{t("shopAddress")}:</strong> {getShopAddress()}
+              </p>
             </div>
 
             <JobSafetyNotice />
 
             <div className="public-job-actions">
-              <Link to={getApplyLink()} className="btn btn-primary public-apply-btn">
+              <Link
+                to={getApplyLink()}
+                className="btn btn-primary public-apply-btn"
+                onClick={handleApplyClick}
+              >
                 {user ? (
                   <>
                     <Send size={17} strokeWidth={2.7} />

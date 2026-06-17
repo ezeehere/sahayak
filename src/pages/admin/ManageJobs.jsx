@@ -69,7 +69,7 @@ function ManageJobs() {
         job.title?.toLowerCase().includes(searchText) ||
         job.category?.toLowerCase().includes(searchText) ||
         job.location?.toLowerCase().includes(searchText) ||
-        job.shop_profiles?.shop_name?.toLowerCase().includes(searchText) ||
+        (job.shop_profiles?.shop_name || job.offline_shop_name || "")?.toLowerCase().includes(searchText) ||
         job.profiles?.name?.toLowerCase().includes(searchText);
 
       const matchesStatus = statusFilter ? job.status === statusFilter : true;
@@ -238,9 +238,9 @@ function ManageJobs() {
                       <h3>{job.title}</h3>
 
                       <p>
-                        {job.shop_profiles?.shop_name || t("localShop")}
+                        {job.shop_profiles?.shop_name || job.offline_shop_name || t("localShop")}
 
-                        {job.shop_profiles?.is_verified && (
+                        {(job.shop_profiles?.is_verified || job.offline_shop_verified) && (
                           <span className="verified-badge">{t("verified")}</span>
                         )}
                       </p>

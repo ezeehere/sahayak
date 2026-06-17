@@ -1,8 +1,13 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useLanguage } from "../context/LanguageContext";
+import {
+  getAuthContextKeys,
+  getJobAuthContextFromUrl,
+  persistJobAuthContextFromUrl,
+} from "../utils/authJobContext";
 
 function GoogleIcon() {
   return (
@@ -46,7 +51,17 @@ function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const redirectPath = new URLSearchParams(location.search).get("redirect");
+  const params = new URLSearchParams(location.search);
+  const redirectPath = params.get("redirect");
+  const action = params.get("action");
+  const jobId = params.get("job");
+
+  const jobAuthContext = useMemo(() => getJobAuthContextFromUrl(), []);
+  const authContextKeys = jobAuthContext ? getAuthContextKeys(jobAuthContext.action) : null;
+
+  useEffect(() => {
+    persistJobAuthContextFromUrl();
+  }, []);
 
   const [form, setForm] = useState({
     email: "",
@@ -71,10 +86,15 @@ function Login() {
     }
 
     setMessage(t("loginSuccessful"));
-    navigate(redirectPath || "/dashboard");
+    window.location.replace("/smart-entry");
   }
 
   async function loginWithGoogle() {
+    persistJobAuthContextFromUrl();
+
+    const finalRole = jobAuthContext?.action === "apply" ? "seeker" : "seeker";
+
+    localStorage.setItem("sahayak_google_role", finalRole);
     setMessage(t("redirectingToGoogle"));
 
     const redirectTo = `${window.location.origin}/auth/callback`;
@@ -104,6 +124,17 @@ function Login() {
             <h1>{t("welcomeBack")}</h1>
             <p>{t("loginToContinue")}</p>
           </div>
+
+          {authContextKeys && (
+            <div className="message" style={{ backgroundColor: "var(--blue)", border: "1.5px solid var(--line)", color: "var(--text)", textAlign: "left" }}>
+              <strong style={{ display: "block", marginBottom: "4px" }}>
+                {t(authContextKeys.titleKey) || authContextKeys.defaultTitle}
+              </strong>
+              <span style={{ fontSize: "13px", lineHeight: "1.4", display: "block" }}>
+                {t(authContextKeys.bodyKey) || authContextKeys.defaultBody}
+              </span>
+            </div>
+          )}
 
           {message && <div className="message">{message}</div>}
 
@@ -176,7 +207,7 @@ function Login() {
 
           <p className="form-bottom clean-form-bottom">
             {t("newToSahayak")}{" "}
-            <Link to="/register">{t("createAccount")}</Link>
+            <Link to={`/register${jobAuthContext?.query || ""}`}>{t("createAccount")}</Link>
           </p>
         </div>
       </section>

@@ -26,8 +26,10 @@ import UpdatePassword from "./pages/UpdatePassword";
 import AdminPostLocalJob from "./pages/admin/AdminPostLocalJob";
 import ReportedJobs from "./pages/admin/ReportedJobs";
 import ShopVerification from "./pages/admin/ShopVerification";
-import PublicJobDetails from "./pages/PublicJobDetails";
 import JobPreferences from "./pages/seeker/JobPreferences";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import OwnerJobPerformance from "./pages/owner/OwnerJobPerformance";
+import SmartEntryRoute from "./routes/SmartEntryRoute";
 
 
 
@@ -322,13 +324,15 @@ function App() {
     <Routes>
 
       <Route path="/" element={<Home />} />
-      <Route path="/jobs/:id" element={<PublicJobDetails />} />
+      <Route path="/browse-jobs" element={<BrowseJobs />} />
+      <Route path="/jobs/:id" element={<JobDetails />} />
 
 
       <Route path="/login" element={<Login />} />
 
       <Route path="/register" element={<Register />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/smart-entry" element={<SmartEntryRoute />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -409,27 +413,7 @@ function App() {
         }
       />
 
-      <Route
-        path="/seeker/jobs"
-        element={
-          <ProtectedRoute>
-            <RoleRoute allowedRole="seeker">
-              <BrowseJobs />
-            </RoleRoute>
-          </ProtectedRoute>
-        }
-      />
 
-      <Route
-        path="/seeker/jobs/:id"
-        element={
-          <ProtectedRoute>
-            <RoleRoute allowedRole="seeker">
-              <JobDetails />
-            </RoleRoute>
-          </ProtectedRoute>
-        }
-      />
 
       <Route
         path="/seeker/saved"
@@ -509,6 +493,17 @@ function App() {
       />
 
       <Route
+        path="/owner/performance"
+        element={
+          <ProtectedRoute>
+            <RoleRoute allowedRole="owner">
+              <OwnerJobPerformance />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
         path="/admin/dashboard"
         element={
           <ProtectedRoute>
@@ -547,6 +542,17 @@ function App() {
           <ProtectedRoute>
             <RoleRoute allowedRole="admin">
               <CategoriesPage />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/analytics"
+        element={
+          <ProtectedRoute>
+            <RoleRoute allowedRole="admin">
+              <AdminAnalytics />
             </RoleRoute>
           </ProtectedRoute>
         }

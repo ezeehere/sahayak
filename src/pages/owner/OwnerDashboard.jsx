@@ -238,8 +238,27 @@ function OwnerDashboard() {
                 {t("viewApplicants")}
               </Link>
             </div>
+
+            <div className="dashboard-card">
+              <h3>{t("jobPerformance")}</h3>
+              <p>{t("jobPerformanceShortcutDesc")}</p>
+              <Link to="/owner/performance" className="btn btn-primary">
+                {t("viewPerformance")}
+              </Link>
+            </div>
           </div>
         </div>
+
+        <section className="mobile-info-section">
+          <div className="mobile-list">
+            <Link to="/owner/performance" className="mobile-list-row">
+              <div>
+                <h3>{t("jobPerformance")}</h3>
+                <p>{t("jobPerformanceShortcutDesc")}</p>
+              </div>
+            </Link>
+          </div>
+        </section>
 
         <section className="mobile-info-section">
           <div className="mobile-section-head">

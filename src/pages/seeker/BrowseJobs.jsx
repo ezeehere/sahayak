@@ -14,6 +14,7 @@ import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import Navbar from "../../components/Navbar";
+import { requireLoginForJobAction } from "../../utils/jobActionGate";
 
 function BrowseJobs() {
   const { user } = useAuth();
@@ -75,10 +76,8 @@ ${jobUrl}`;
 
 
   useEffect(() => {
-    if (user?.id) {
-      fetchData();
-    }
-  }, [user]);
+    fetchData();
+  }, [user?.id]);
 
   async function fetchData() {
     setLoading(true);
@@ -117,13 +116,17 @@ ${jobUrl}`;
       setCategories(categoryData || []);
     }
 
-    const { data: savedData, error: savedError } = await supabase
-      .from("saved_jobs")
-      .select("job_id")
-      .eq("seeker_id", user.id);
+    if (user?.id) {
+      const { data: savedData, error: savedError } = await supabase
+        .from("saved_jobs")
+        .select("job_id")
+        .eq("seeker_id", user.id);
 
-    if (!savedError && savedData) {
-      setSavedJobIds(savedData.map((item) => item.job_id));
+      if (!savedError && savedData) {
+        setSavedJobIds(savedData.map((item) => item.job_id));
+      }
+    } else {
+      setSavedJobIds([]);
     }
 
     setLoading(false);
@@ -137,7 +140,7 @@ ${jobUrl}`;
         job.title?.toLowerCase().includes(searchText) ||
         job.location?.toLowerCase().includes(searchText) ||
         job.category?.toLowerCase().includes(searchText) ||
-        job.shop_profiles?.shop_name?.toLowerCase().includes(searchText);
+        (job.shop_profiles?.shop_name || job.offline_shop_name || "")?.toLowerCase().includes(searchText);
 
       const matchesCategory = category ? job.category === category : true;
 
@@ -146,10 +149,11 @@ ${jobUrl}`;
   }, [jobs, search, category]);
 
   async function toggleSavedJob(jobId) {
-    if (!user?.id) {
-      setMessage(t("loginAgain"));
-      return;
-    }
+    const loggedInUser = await requireLoginForJobAction({
+      type: "save",
+      jobId,
+    });
+    if (!loggedInUser) return;
 
     const alreadySaved = savedJobIds.includes(jobId);
 
@@ -344,7 +348,7 @@ ${jobUrl}`;
                         </button>
 
                         <Link
-                          to={`/seeker/jobs/${job.id}`}
+                          to={`/jobs/${job.id}`}
                           className="btn btn-primary compact-detail-btn"
                         >
                           {t("viewDetails")}
@@ -397,7 +401,7 @@ ${jobUrl}`;
 
                   <div className="job-actions">
                     <Link
-                      to={`/seeker/jobs/${job.id}`}
+                      to={`/jobs/${job.id}`}
                       className="btn btn-primary"
                     >
                       {t("viewDetails")}

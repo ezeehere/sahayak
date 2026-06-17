@@ -28,7 +28,7 @@ function MobileBottomNav() {
         icon: Home,
       },
       {
-        to: "/seeker/jobs",
+        to: "/browse-jobs",
         label: t("browseJobs"),
         icon: BriefcaseBusiness,
       },

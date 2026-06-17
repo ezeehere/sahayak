@@ -114,7 +114,7 @@ function SavedJobs() {
             {savedJobs.length} {t("savedJobs")}
           </h2>
 
-          <Link to="/seeker/jobs" className="mobile-small-link">
+          <Link to="/browse-jobs" className="mobile-small-link">
             {t("browseJobs")}
           </Link>
         </div>
@@ -124,7 +124,7 @@ function SavedJobs() {
             <h3>{t("noSavedJobs")}</h3>
             <p>{t("noSavedJobsDesc")}</p>
 
-            <Link to="/seeker/jobs" className="btn btn-primary">
+            <Link to="/browse-jobs" className="btn btn-primary">
               {t("browseJobs")}
             </Link>
           </div>
@@ -145,9 +145,9 @@ function SavedJobs() {
 
                         <p className="mobile-shop-line">
                           <Store size={14} strokeWidth={2.6} />
-                          <span>{job.shop_profiles?.shop_name || t("localShop")}</span>
+                          <span>{job.shop_profiles?.shop_name || job.offline_shop_name || t("localShop")}</span>
 
-                          {job.shop_profiles?.is_verified && (
+                          {(job.shop_profiles?.is_verified || job.offline_shop_verified) && (
                             <span className="tiny-verified">{t("verified")}</span>
                           )}
                         </p>
@@ -189,7 +189,7 @@ function SavedJobs() {
                       </div>
 
                       <Link
-                        to={`/seeker/jobs/${job.id}`}
+                        to={`/jobs/${job.id}`}
                         className="btn btn-primary compact-detail-btn"
                       >
                         {t("viewDetails")}
@@ -217,9 +217,9 @@ function SavedJobs() {
                     </div>
 
                     <p className="shop-name">
-                      {job.shop_profiles?.shop_name || t("localShop")}
+                      {job.shop_profiles?.shop_name || job.offline_shop_name || t("localShop")}
 
-                      {job.shop_profiles?.is_verified && (
+                      {(job.shop_profiles?.is_verified || job.offline_shop_verified) && (
                         <span className="verified-badge">{t("verified")}</span>
                       )}
                     </p>
@@ -246,7 +246,7 @@ function SavedJobs() {
 
                     <div className="job-actions">
                       <Link
-                        to={`/seeker/jobs/${job.id}`}
+                        to={`/jobs/${job.id}`}
                         className="btn btn-primary"
                       >
                         {t("viewDetails")}

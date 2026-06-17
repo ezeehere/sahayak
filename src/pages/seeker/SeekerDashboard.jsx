@@ -64,6 +64,7 @@ function SeekerDashboard() {
           title,
           salary,
           location,
+          offline_shop_name,
           shop_profiles (
             shop_name
           )
@@ -128,7 +129,7 @@ function SeekerDashboard() {
           <p>{t("dashboardSeekerDesc")}</p>
 
           <div className="mobile-primary-action">
-            <Link to="/seeker/jobs" className="btn btn-primary">
+            <Link to="/browse-jobs" className="btn btn-primary">
               {t("browseJobs")}
             </Link>
           </div>
@@ -183,7 +184,7 @@ function SeekerDashboard() {
             <div className="dashboard-card">
               <h3>{t("browseJobs")}</h3>
               <p>{t("browseJobsDesc")}</p>
-              <Link to="/seeker/jobs" className="btn btn-primary">
+              <Link to="/browse-jobs" className="btn btn-primary">
                 {t("browseJobs")}
               </Link>
             </div>
@@ -244,14 +245,14 @@ function SeekerDashboard() {
             <div className="mobile-list">
               {latestApplications.map((application) => (
                 <Link
-                  to={`/seeker/jobs/${application.jobs?.id}`}
+                  to={`/jobs/${application.jobs?.id}`}
                   className="mobile-list-row"
                   key={application.id}
                 >
                   <div>
                     <h3>{application.jobs?.title || t("job")}</h3>
                     <p>
-                      {application.jobs?.shop_profiles?.shop_name || t("localShop")} •{" "}
+                      {application.jobs?.shop_profiles?.shop_name || application.jobs?.offline_shop_name || t("localShop")} •{" "}
                       {application.jobs?.salary || t("salary")}
                     </p>
                   </div>
@@ -272,7 +273,7 @@ function SeekerDashboard() {
               <h2>{t("recommendedJobs")}</h2>
             </div>
 
-            <Link to="/seeker/jobs">{t("viewAll")}</Link>
+            <Link to="/browse-jobs">{t("viewAll")}</Link>
           </div>
 
           {recommendedJobs.length === 0 ? (
@@ -284,14 +285,14 @@ function SeekerDashboard() {
             <div className="mobile-list">
               {recommendedJobs.map((job) => (
                 <Link
-                  to={`/seeker/jobs/${job.id}`}
+                  to={`/jobs/${job.id}`}
                   className="mobile-list-row"
                   key={job.id}
                 >
                   <div>
                     <h3>{job.title}</h3>
                     <p>
-                      {job.shop_profiles?.shop_name || t("localShop")} • {job.location} •{" "}
+                      {job.shop_profiles?.shop_name || job.offline_shop_name || t("localShop")} • {job.location} •{" "}
                       {job.salary}
                     </p>
                   </div>

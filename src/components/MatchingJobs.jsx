@@ -175,7 +175,7 @@ function MatchingJobs() {
         <div className="matching-jobs-list">
           {matchingJobs.map((job) => (
             <Link
-              to={`/seeker/jobs/${job.id}`}
+              to={`/jobs/${job.id}`}
               className="matching-job-row"
               key={job.id}
             >

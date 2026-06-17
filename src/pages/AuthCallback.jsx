@@ -1,10 +1,7 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 
 function AuthCallback() {
-    const navigate = useNavigate();
-
     useEffect(() => {
         completeGoogleLogin();
     }, []);
@@ -14,7 +11,7 @@ function AuthCallback() {
 
         if (error || !data.session?.user) {
             console.log(error);
-            navigate("/login");
+            window.location.replace("/login");
             return;
         }
 
@@ -37,7 +34,7 @@ function AuthCallback() {
 
         if (profileError) {
             console.log(profileError);
-            navigate("/login");
+            window.location.replace("/login");
             return;
         }
 
@@ -54,7 +51,7 @@ function AuthCallback() {
 
             if (insertError) {
                 console.log(insertError);
-                navigate("/login");
+                window.location.replace("/login");
                 return;
             }
         } else {
@@ -71,20 +68,18 @@ function AuthCallback() {
 
         localStorage.removeItem("sahayak_google_role");
 
-        if (finalRole === "owner") {
-            navigate("/owner/dashboard");
-        } else if (finalRole === "admin") {
-            navigate("/admin/dashboard");
-        } else {
-            navigate("/seeker/dashboard");
-        }
+        window.location.replace("/smart-entry");
     }
 
     return (
-        <main className="page-center">
-            <div className="auth-card">
-                <h1>Completing sign in...</h1>
-                <p className="subtitle">Please wait while we prepare your account.</p>
+        <main className="auth-page" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh" }}>
+            <div className="auth-card clean-auth-card" style={{ maxWidth: "420px", width: "100%", textAlign: "center", padding: "40px" }}>
+                <div className="auth-head" style={{ marginBottom: "0" }}>
+                    <h1 style={{ fontSize: "24px", marginBottom: "12px" }}>Completing sign in...</h1>
+                    <p style={{ color: "var(--text-muted)", fontSize: "14px", margin: "0" }}>
+                        Please wait while we prepare your account.
+                    </p>
+                </div>
             </div>
         </main>
     );
