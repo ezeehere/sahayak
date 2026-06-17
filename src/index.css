@@ -2766,3 +2766,267 @@ button {
     border-color: var(--line);
   }
 }
+
+/* ============================= */
+/* JOB DETAILS DESKTOP + MOBILE FIX */
+/* ============================= */
+
+.job-details-page {
+  max-width: 1120px;
+  margin: 36px auto 120px;
+  padding: 0 18px;
+}
+
+.details-card.mobile-job-detail-card {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1.8px solid var(--line);
+  border-radius: 36px;
+  padding: 46px;
+  box-shadow: var(--soft-shadow);
+}
+
+.mobile-job-detail-head h1 {
+  font-size: clamp(44px, 5vw, 76px);
+  line-height: 0.95;
+  letter-spacing: -3.5px;
+  margin: 24px 0 14px;
+}
+
+.detail-shop-line,
+.mobile-shop-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--muted);
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.tiny-verified {
+  background: var(--green);
+  border: 1.4px solid var(--line);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 4px 9px;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.mobile-detail-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin: 30px 0 24px;
+}
+
+.mobile-detail-pill {
+  background: #f9f7f1;
+  border: 1.6px solid var(--line);
+  border-radius: 24px;
+  padding: 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.mobile-detail-pill.salary-pill {
+  background: #fff8cc;
+}
+
+.mobile-detail-pill small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  margin-bottom: 5px;
+}
+
+.mobile-detail-pill strong {
+  display: block;
+  font-size: 17px;
+  line-height: 1.25;
+}
+
+.mobile-main-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 24px 0 30px;
+  flex-wrap: wrap;
+}
+
+.mobile-main-actions>.btn {
+  width: auto;
+  min-width: 190px;
+  min-height: 48px;
+  border-radius: 999px;
+}
+
+.mobile-contact-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.mobile-contact-actions .btn {
+  width: auto;
+  min-width: 150px;
+  min-height: 48px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-disabled {
+  background: #d9dee8;
+  color: #4b5563;
+  border: 1.7px solid var(--line);
+  cursor: not-allowed;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.btn-whatsapp {
+  background: #25d366;
+  color: #ffffff;
+  border: 1.7px solid var(--line);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.15);
+}
+
+.mobile-detail-section {
+  border-top: 1.5px solid #e8e0d4;
+  padding-top: 24px;
+  margin-top: 24px;
+}
+
+.mobile-detail-section h3 {
+  font-size: 28px;
+  letter-spacing: -1px;
+  margin-bottom: 10px;
+}
+
+.mobile-detail-section p {
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.mobile-info-list {
+  display: grid;
+  gap: 8px;
+}
+
+.mobile-info-list p {
+  margin: 0;
+}
+
+.mobile-info-list strong {
+  color: var(--text);
+}
+
+/* Desktop back/save bar */
+.mobile-detail-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.mobile-back-link {
+  text-decoration: none;
+  color: var(--text);
+  background: white;
+  border: 1.5px solid var(--line);
+  border-radius: 999px;
+  padding: 10px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 900;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile adjustments */
+@media (max-width: 760px) {
+  .job-details-page {
+    margin-top: 14px;
+    padding: 0 14px;
+  }
+
+  .details-card.mobile-job-detail-card {
+    padding: 20px;
+    border-radius: 30px;
+  }
+
+  .mobile-job-detail-head h1 {
+    font-size: 34px;
+    line-height: 1;
+    letter-spacing: -2px;
+    margin-top: 12px;
+    margin-bottom: 12px;
+  }
+
+  .mobile-detail-summary {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 16px 0;
+  }
+
+  .mobile-detail-pill {
+    border-radius: 22px;
+    padding: 13px;
+    gap: 9px;
+  }
+
+  .mobile-detail-pill small {
+    font-size: 11px;
+  }
+
+  .mobile-detail-pill strong {
+    font-size: 13px;
+  }
+
+  .mobile-main-actions {
+    display: grid;
+    gap: 10px;
+    margin: 18px 0;
+  }
+
+  .mobile-main-actions>.btn {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .mobile-contact-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .mobile-contact-actions .btn {
+    min-width: 0;
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .mobile-detail-section {
+    padding-top: 16px;
+    margin-top: 16px;
+  }
+
+  .mobile-detail-section h3 {
+    font-size: 22px;
+  }
+
+  .mobile-detail-section p {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 390px) {
+  .mobile-detail-summary {
+    grid-template-columns: 1fr;
+  }
+}
