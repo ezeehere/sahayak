@@ -5234,3 +5234,29 @@ textarea {
     font-weight: 720 !important;
   }
 }
+
+/* ============================= */
+/* CENTER AUTH PAGES ON MOBILE */
+/* ============================= */
+
+@media (max-width: 520px) {
+  .auth-page {
+    min-height: 100dvh;
+    padding: 18px 14px;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .auth-shell {
+    width: 100%;
+    margin: auto 0;
+  }
+
+  .auth-back-link {
+    margin-bottom: 14px;
+  }
+
+  .auth-card.clean-auth-card {
+    margin: 0 auto;
+  }
+}
