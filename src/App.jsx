@@ -23,7 +23,11 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import UpdatePassword from "./pages/UpdatePassword";
-
+import AdminPostLocalJob from "./pages/admin/AdminPostLocalJob";
+import ReportedJobs from "./pages/admin/ReportedJobs";
+import ShopVerification from "./pages/admin/ShopVerification";
+import PublicJobDetails from "./pages/PublicJobDetails";
+import JobPreferences from "./pages/seeker/JobPreferences";
 
 
 
@@ -318,6 +322,7 @@ function App() {
     <Routes>
 
       <Route path="/" element={<Home />} />
+      <Route path="/jobs/:id" element={<PublicJobDetails />} />
 
 
       <Route path="/login" element={<Login />} />
@@ -328,6 +333,39 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/update-password" element={<UpdatePassword />} />
+
+      <Route
+        path="/admin/post-local-job"
+        element={
+          <ProtectedRoute>
+            <RoleRoute allowedRole="admin">
+              <AdminPostLocalJob />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/reports"
+        element={
+          <ProtectedRoute>
+            <RoleRoute allowedRole="admin">
+              <ReportedJobs />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/shop-verification"
+        element={
+          <ProtectedRoute>
+            <RoleRoute allowedRole="admin">
+              <ShopVerification />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/dashboard"
@@ -355,6 +393,17 @@ function App() {
           <ProtectedRoute>
             <RoleRoute allowedRole="seeker">
               <SeekerProfile />
+            </RoleRoute>
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/seeker/preferences"
+        element={
+          <ProtectedRoute>
+            <RoleRoute allowedRole="seeker">
+              <JobPreferences />
             </RoleRoute>
           </ProtectedRoute>
         }

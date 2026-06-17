@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ArrowLeft, Eye, EyeOff } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useLanguage } from "../context/LanguageContext";
 
@@ -44,6 +44,9 @@ function friendlyAuthError(errorMessage) {
 function Login() {
   const { t } = useLanguage();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const redirectPath = new URLSearchParams(location.search).get("redirect");
 
   const [form, setForm] = useState({
     email: "",
@@ -68,7 +71,7 @@ function Login() {
     }
 
     setMessage(t("loginSuccessful"));
-    navigate("/dashboard");
+    navigate(redirectPath || "/dashboard");
   }
 
   async function loginWithGoogle() {

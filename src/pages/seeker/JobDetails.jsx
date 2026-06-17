@@ -7,15 +7,20 @@ import {
   BriefcaseBusiness,
   Clock,
   MapPin,
+  Share2,
   MessageCircle,
   Phone,
   Store,
   Wallet,
+  Flag,
+  X,
+  AlertTriangle,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import Navbar from "../../components/Navbar";
+import JobSafetyNotice from "../../components/JobSafetyNotice";
 
 function JobDetails() {
   const { id } = useParams();
@@ -29,6 +34,77 @@ function JobDetails() {
 
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState("");
+  const [reportDetails, setReportDetails] = useState("");
+  const [reportMessage, setReportMessage] = useState("");
+
+  async function submitJobReport(e) {
+    e.preventDefault();
+
+    if (!user?.id || !job?.id) {
+      setReportMessage(t("pleaseLoginAgain"));
+      return;
+    }
+
+    if (!reportReason) {
+      setReportMessage(t("pleaseSelectReason"));
+      return;
+    }
+
+    setReportMessage(t("submittingReport"));
+
+    const { error } = await supabase.from("job_reports").insert({
+      job_id: job.id,
+      reporter_id: user.id,
+      reason: reportReason,
+      details: reportDetails,
+      status: "pending",
+    });
+
+    if (error) {
+      console.log(error);
+      setReportMessage(error.message);
+      return;
+    }
+
+    setReportMessage(t("reportSubmittedSuccess"));
+
+    setTimeout(() => {
+      setShowReportModal(false);
+      setReportReason("");
+      setReportDetails("");
+      setReportMessage("");
+    }, 1200);
+  }
+  function getShopName() {
+    return job?.shop_profiles?.shop_name || job?.offline_shop_name || t("localShop");
+  }
+
+  function getShareText() {
+    const jobUrl = `${window.location.origin}/jobs/${job.id}`;
+
+    return `Sahayak Job Alert
+
+${job.title}
+Shop: ${getShopName()}
+Salary: ${job.salary}
+Timing: ${job.timing}
+Location: ${job.location}
+
+View job:
+${jobUrl}`;
+  }
+
+  function shareJobOnWhatsApp() {
+    if (!job) return;
+
+    const text = getShareText();
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+  }
 
   useEffect(() => {
     if (user?.id && id) {
@@ -178,7 +254,7 @@ function JobDetails() {
     return cleanPhone;
   }
 
-  const cleanPhone = getCleanPhone(owner?.phone);
+  const cleanPhone = getCleanPhone(job?.offline_shop_phone || owner?.phone);
 
   const whatsappText = job
     ? `Hello, I saw your job post on Sahayak: ${job.title}`
@@ -258,9 +334,9 @@ function JobDetails() {
 
             <p className="mobile-shop-line detail-shop-line">
               <Store size={15} strokeWidth={2.6} />
-              <span>{job.shop_profiles?.shop_name || t("localShop")}</span>
+              <span>{getShopName()}</span>
 
-              {job.shop_profiles?.is_verified && (
+              {(job.shop_profiles?.is_verified || job.offline_shop_verified) && (
                 <span className="tiny-verified">{t("verified")}</span>
               )}
             </p>
@@ -302,6 +378,8 @@ function JobDetails() {
             </div>
           </div>
 
+          <JobSafetyNotice />
+
           <div className="mobile-main-actions">
             {alreadyApplied ? (
               <button className="btn btn-disabled" disabled>
@@ -313,21 +391,32 @@ function JobDetails() {
               </button>
             )}
 
-            <div className="mobile-contact-actions">
-              <a href={callLink} className="btn btn-light">
+            <button
+              type="button"
+              className="btn whatsapp-share-btn detail-share-button"
+              onClick={shareJobOnWhatsApp}
+            >
+              <Share2 size={17} strokeWidth={2.7} />
+              {t("shareOnWhatsApp")}
+            </button>
+
+            <div className="detail-secondary-action-grid">
+              <a
+                href={cleanPhone ? `tel:${cleanPhone}` : undefined}
+                className="btn call-owner-btn"
+              >
                 <Phone size={17} strokeWidth={2.7} />
                 {t("callOwner")}
               </a>
 
-              <a
-                href={whatsappLink}
-                target="_blank"
-                rel="noreferrer"
-                className="btn btn-whatsapp"
+              <button
+                type="button"
+                className="btn report-job-btn"
+                onClick={() => setShowReportModal(true)}
               >
-                <MessageCircle size={17} strokeWidth={2.7} />
-                {t("whatsapp")}
-              </a>
+                <Flag size={17} strokeWidth={2.7} />
+                {t("report")}
+              </button>
             </div>
           </div>
 
@@ -372,11 +461,71 @@ function JobDetails() {
 
               <p>
                 <strong>{t("phone")}:</strong>{" "}
-                {owner?.phone || t("notAvailable")}
+                {job.offline_shop_phone || owner?.phone || t("notAvailable")}
               </p>
             </div>
           </section>
         </article>
+
+        {showReportModal && (
+          <div className="report-modal-backdrop">
+            <div className="report-modal-card">
+              <div className="report-modal-head">
+                <div>
+                  <span className="report-icon">
+                    <AlertTriangle size={20} strokeWidth={2.8} />
+                  </span>
+                  <h2>{t("reportJob")}</h2>
+                  <p>{t("reportJobDesc")}</p>
+                </div>
+
+                <button
+                  type="button"
+                  className="report-close-btn"
+                  onClick={() => setShowReportModal(false)}
+                >
+                  <X size={20} strokeWidth={2.8} />
+                </button>
+              </div>
+
+              {reportMessage && <div className="message">{reportMessage}</div>}
+
+              <form className="report-form" onSubmit={submitJobReport}>
+                <div>
+                  <label>{t("reason")}</label>
+                  <select
+                    value={reportReason}
+                    onChange={(e) => setReportReason(e.target.value)}
+                    required
+                  >
+                    <option value="">{t("selectReason")}</option>
+                    <option value="already_filled">{t("jobAlreadyFilled")}</option>
+                    <option value="fake_job">{t("fakeOrSuspiciousJob")}</option>
+                    <option value="wrong_contact">{t("wrongContactNumber")}</option>
+                    <option value="salary_mismatch">{t("salaryMismatch")}</option>
+                    <option value="owner_not_responding">{t("ownerNotResponding")}</option>
+                    <option value="asking_money">{t("askingForMoney")}</option>
+                    <option value="other">{t("other")}</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label>{t("detailsOptional")}</label>
+                  <textarea
+                    value={reportDetails}
+                    onChange={(e) => setReportDetails(e.target.value)}
+                    rows="4"
+                    placeholder={t("reportDetailsPlaceholder")}
+                  />
+                </div>
+
+                <button type="submit" className="btn report-submit-btn">
+                  {t("submitReport")}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
       </main>
     </>
   );

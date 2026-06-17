@@ -4,6 +4,8 @@ import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import Navbar from "../../components/Navbar";
+import ProfileStrengthCard from "../../components/ProfileStrengthCard";
+import MatchingJobs from "../../components/MatchingJobs";
 
 function SeekerDashboard() {
   const { user, profile } = useAuth();
@@ -18,6 +20,7 @@ function SeekerDashboard() {
 
   const [latestApplications, setLatestApplications] = useState([]);
   const [recommendedJobs, setRecommendedJobs] = useState([]);
+  const [seekerProfile, setSeekerProfile] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -72,7 +75,7 @@ function SeekerDashboard() {
 
     const { data: seekerProfileData, error: seekerProfileError } = await supabase
       .from("seeker_profiles")
-      .select("id")
+      .select("*")
       .eq("user_id", user.id)
       .maybeSingle();
 
@@ -90,6 +93,7 @@ function SeekerDashboard() {
 
     setLatestApplications((applicationData || []).slice(0, 3));
     setRecommendedJobs((jobsData || []).slice(0, 3));
+    setSeekerProfile(seekerProfileData || null);
     setLoading(false);
   }
 
@@ -162,6 +166,10 @@ function SeekerDashboard() {
           </div>
         </div>
 
+        <ProfileStrengthCard profile={profile} seekerProfile={seekerProfile} />
+
+        <MatchingJobs />
+
         <div className="desktop-dashboard-only">
           <div className="dashboard-grid">
             <div className="dashboard-card">
@@ -195,8 +203,27 @@ function SeekerDashboard() {
                 {t("viewApplications")}
               </Link>
             </div>
+
+            <div className="dashboard-card">
+              <h3>{t("jobPreferences")}</h3>
+              <p>{t("jobPreferencesShortcutDesc")}</p>
+              <Link to="/seeker/preferences" className="btn btn-primary">
+                {t("editPreferences")}
+              </Link>
+            </div>
           </div>
         </div>
+
+        <section className="mobile-info-section">
+          <div className="mobile-list">
+            <Link to="/seeker/preferences" className="mobile-list-row">
+              <div>
+                <h3>{t("jobPreferences")}</h3>
+                <p>{t("jobPreferencesShortcutDesc")}</p>
+              </div>
+            </Link>
+          </div>
+        </section>
 
         <section className="mobile-info-section">
           <div className="mobile-section-head">

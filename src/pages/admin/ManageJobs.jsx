@@ -104,6 +104,36 @@ function ManageJobs() {
     setMessage(t("jobStatusUpdatedSuccess"));
   }
 
+  async function toggleJobHiringStatus(job) {
+    const nextStatus = job.hiring_status === "filled" ? "open" : "filled";
+
+    const updateData =
+      nextStatus === "filled"
+        ? {
+            hiring_status: "filled",
+            filled_at: new Date().toISOString(),
+            last_checked_at: new Date().toISOString(),
+          }
+        : {
+            hiring_status: "open",
+            filled_at: null,
+            last_checked_at: new Date().toISOString(),
+          };
+
+    const { error } = await supabase
+      .from("jobs")
+      .update(updateData)
+      .eq("id", job.id);
+
+    if (error) {
+      console.log(error);
+      setMessage(error.message);
+      return;
+    }
+
+    fetchData();
+  }
+
   function formatDate(dateValue) {
     if (!dateValue) return t("notAvailable");
 
@@ -216,9 +246,20 @@ function ManageJobs() {
                       </p>
                     </div>
 
-                    <span className={`status-badge status-${job.status}`}>
-                      {t(job.status) || job.status}
-                    </span>
+                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                      <span
+                        className={
+                          job.hiring_status === "filled"
+                            ? "job-status-pill filled"
+                            : "job-status-pill open"
+                        }
+                      >
+                        {job.hiring_status === "filled" ? t("filled") : t("open")}
+                      </span>
+                      <span className={`status-badge status-${job.status}`}>
+                        {t(job.status) || job.status}
+                      </span>
+                    </div>
                   </div>
 
                   <div className="admin-job-details">
@@ -267,14 +308,29 @@ function ManageJobs() {
                   <div className="status-control">
                     <label>{t("updateJobStatus")}</label>
 
-                    <select
-                      value={job.status}
-                      onChange={(e) => updateJobStatus(job.id, e.target.value)}
-                    >
-                      <option value="pending">{t("pending")}</option>
-                      <option value="approved">{t("approved")}</option>
-                      <option value="closed">{t("closed")}</option>
-                    </select>
+                    <div style={{ display: "flex", gap: "12px", alignItems: "center", flexWrap: "wrap" }}>
+                      <select
+                        value={job.status}
+                        onChange={(e) => updateJobStatus(job.id, e.target.value)}
+                        style={{ width: "auto", minWidth: "180px" }}
+                      >
+                        <option value="pending">{t("pending")}</option>
+                        <option value="approved">{t("approved")}</option>
+                        <option value="closed">{t("closed")}</option>
+                      </select>
+
+                      <button
+                        type="button"
+                        className={
+                          job.hiring_status === "filled"
+                            ? "btn reopen-job-btn"
+                            : "btn mark-filled-btn"
+                        }
+                        onClick={() => toggleJobHiringStatus(job)}
+                      >
+                        {job.hiring_status === "filled" ? t("reopenJob") : t("markAsFilled")}
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

@@ -20,6 +20,7 @@ function PostJob() {
     salary: "",
     timing: "",
     location: "",
+    expiresAt: "",
   });
 
   const [message, setMessage] = useState("");
@@ -87,6 +88,9 @@ function PostJob() {
       timing: form.timing,
       location: form.location,
       status: "approved",
+      hiring_status: "open",
+      expires_at: form.expiresAt || null,
+      last_checked_at: new Date().toISOString(),
     });
 
     if (error) {
@@ -105,6 +109,7 @@ function PostJob() {
       salary: "",
       timing: "",
       location: "",
+      expiresAt: "",
     });
   }
 
@@ -245,6 +250,15 @@ function PostJob() {
               placeholder={t("postJobLocationPlaceholder")}
               value={form.location}
               onChange={(e) => setForm({ ...form, location: e.target.value })}
+              required
+            />
+
+            <label>{t("expiryDate") || "Expiry Date"}</label>
+            <input
+              type="date"
+              name="expiresAt"
+              value={form.expiresAt}
+              onChange={(e) => setForm({ ...form, expiresAt: e.target.value })}
               required
             />
 

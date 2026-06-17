@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import {
   ArrowRight,
   BadgeCheck,
-  BriefcaseBusiness,
   Building2,
   CheckCircle2,
   ClipboardList,

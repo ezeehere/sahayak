@@ -83,6 +83,35 @@ function MyJobs() {
     fetchMyJobs();
   }
 
+  async function toggleJobHiringStatus(job) {
+    const nextStatus = job.hiring_status === "filled" ? "open" : "filled";
+
+    const updateData =
+      nextStatus === "filled"
+        ? {
+            hiring_status: "filled",
+            filled_at: new Date().toISOString(),
+            last_checked_at: new Date().toISOString(),
+          }
+        : {
+            hiring_status: "open",
+            filled_at: null,
+            last_checked_at: new Date().toISOString(),
+          };
+
+    const { error } = await supabase
+      .from("jobs")
+      .update(updateData)
+      .eq("id", job.id);
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    fetchMyJobs();
+  }
+
   if (!user?.id || loading) {
     return (
       <>
@@ -126,9 +155,20 @@ function MyJobs() {
               <div className="job-card" key={job.id}>
                 <div className="job-top">
                   <h3>{job.title}</h3>
-                  <span className={`status-badge status-${job.status}`}>
-                    {t(job.status) || job.status}
-                  </span>
+                  <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                    <span
+                      className={
+                        job.hiring_status === "filled"
+                          ? "job-status-pill filled"
+                          : "job-status-pill open"
+                      }
+                    >
+                      {job.hiring_status === "filled" ? t("filled") : t("open")}
+                    </span>
+                    <span className={`status-badge status-${job.status}`}>
+                      {t(job.status) || job.status}
+                    </span>
+                  </div>
                 </div>
 
                 <p className="shop-name">
@@ -167,6 +207,18 @@ function MyJobs() {
                   <Link to="/owner/applicants" className="btn btn-primary">
                     {t("viewApplicants")}
                   </Link>
+
+                  <button
+                    type="button"
+                    className={
+                      job.hiring_status === "filled"
+                        ? "btn reopen-job-btn"
+                        : "btn mark-filled-btn"
+                    }
+                    onClick={() => toggleJobHiringStatus(job)}
+                  >
+                    {job.hiring_status === "filled" ? t("reopenJob") : t("markAsFilled")}
+                  </button>
 
                   {job.status === "closed" ? (
                     <button

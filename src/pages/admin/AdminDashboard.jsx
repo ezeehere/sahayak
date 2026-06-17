@@ -155,6 +155,35 @@ function AdminDashboard() {
             </div>
           </div>
 
+          <section className="admin-tools-section">
+            <div className="section-title-row">
+              <div>
+                <p className="tagline">{t("adminTools")}</p>
+                <h2>{t("quickActions")}</h2>
+              </div>
+            </div>
+
+            <div className="admin-tools-grid">
+              <Link to="/admin/post-local-job" className="admin-tool-card">
+                <h3>{t("postLocalJob")}</h3>
+                <p>{t("postLocalJobDesc")}</p>
+                <span>{t("postJob")}</span>
+              </Link>
+
+              <Link to="/admin/reports" className="admin-tool-card">
+                <h3>{t("reportedJobs")}</h3>
+                <p>{t("reportedJobsDesc")}</p>
+                <span>{t("viewReports")}</span>
+              </Link>
+
+              <Link to="/admin/shop-verification" className="admin-tool-card">
+                <h3>{t("shopVerification")}</h3>
+                <p>{t("shopVerificationToolDesc")}</p>
+                <span>{t("reviewShops")}</span>
+              </Link>
+            </div>
+          </section>
+
           <div className="dashboard-grid admin-action-grid">
             <div className="dashboard-card">
               <h3>{t("manageUsers")}</h3>
@@ -187,6 +216,15 @@ function AdminDashboard() {
             <div>
               <p className="tagline mini-tagline">{t("quickManage")}</p>
               <h2>{t("adminTools")}</h2>
+              <Link
+                to="/admin/post-local-job"
+                className="mobile-list-row admin-tool-row"
+              >
+                <div>
+                  <h3>Post Local Job</h3>
+                  <p>Add a job manually for an offline shop owner.</p>
+                </div>
+              </Link>
             </div>
           </div>
 
@@ -212,6 +250,23 @@ function AdminDashboard() {
               <div>
                 <h3>{t("categories")}</h3>
                 <p>{t("categoriesDesc")}</p>
+              </div>
+            </Link>
+
+            <Link to="/admin/reports" className="mobile-list-row admin-tool-row">
+              <div>
+                <h3>Reported Jobs</h3>
+                <p>Review fake, filled, or suspicious job reports.</p>
+              </div>
+            </Link>
+
+            <Link
+              to="/admin/shop-verification"
+              className="mobile-list-row admin-tool-row"
+            >
+              <div>
+                <h3>{t("shopVerification")}</h3>
+                <p>{t("shopVerificationToolDesc")}</p>
               </div>
             </Link>
           </div>

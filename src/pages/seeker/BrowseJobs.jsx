@@ -8,6 +8,7 @@ import {
   MapPin,
   Search,
   Store,
+  Share2,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
@@ -27,6 +28,51 @@ function BrowseJobs() {
 
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  function getShopName(job) {
+    return job.shop_profiles?.shop_name || job.offline_shop_name || t("localShop");
+  }
+
+  function isVerifiedJob(job) {
+    return job.shop_profiles?.is_verified || job.offline_shop_verified;
+  }
+
+  function getShareText(job) {
+    const jobUrl = `${window.location.origin}/jobs/${job.id}`;
+
+    return `Sahayak Job Alert
+
+${job.title}
+Shop: ${getShopName(job)}
+Salary: ${job.salary}
+Timing: ${job.timing}
+Location: ${job.location}
+
+View job:
+${jobUrl}`;
+  }
+
+  function shareJobOnWhatsApp(job) {
+    const text = getShareText(job);
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+  }
+
+  function getExpiryText(job) {
+    if (!job.expires_at) return t("noExpiry");
+
+    const today = new Date();
+    const expiry = new Date(job.expires_at);
+    const diffTime = expiry - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return t("expired");
+    if (diffDays === 0) return t("expiresToday");
+    if (diffDays === 1) return t("expiresTomorrow");
+
+    return `${t("expiresIn")} ${diffDays} ${t("days")}`;
+  }
+
 
   useEffect(() => {
     if (user?.id) {
@@ -37,6 +83,7 @@ function BrowseJobs() {
   async function fetchData() {
     setLoading(true);
 
+    const today = new Date().toISOString().slice(0, 10);
     const { data: jobData, error: jobError } = await supabase
       .from("jobs")
       .select(
@@ -50,6 +97,8 @@ function BrowseJobs() {
       `
       )
       .eq("status", "approved")
+      .eq("hiring_status", "open")
+      .gte("expires_at", today)
       .order("created_at", { ascending: false });
 
     if (jobError) {
@@ -229,9 +278,9 @@ function BrowseJobs() {
 
                         <p className="mobile-shop-line">
                           <Store size={14} strokeWidth={2.6} />
-                          <span>{job.shop_profiles?.shop_name || t("localShop")}</span>
+                          <span>{getShopName(job)}</span>
 
-                          {job.shop_profiles?.is_verified && (
+                          {isVerifiedJob(job) && (
                             <span className="tiny-verified">{t("verified")}</span>
                           )}
                         </p>
@@ -270,6 +319,10 @@ function BrowseJobs() {
                         <MapPin size={14} strokeWidth={2.6} />
                         {job.location}
                       </span>
+
+                      <span className="job-freshness-pill">
+                        {getExpiryText(job)}
+                      </span>
                     </div>
 
                     <p className="mobile-job-desc">{job.description}</p>
@@ -280,12 +333,23 @@ function BrowseJobs() {
                         <small>{job.job_type}</small>
                       </div>
 
-                      <Link
-                        to={`/seeker/jobs/${job.id}`}
-                        className="btn btn-primary compact-detail-btn"
-                      >
-                        {t("viewDetails")}
-                      </Link>
+                      <div className="mobile-job-action-buttons">
+                        <button
+                          type="button"
+                          className="btn whatsapp-share-btn compact-share-btn"
+                          onClick={() => shareJobOnWhatsApp(job)}
+                        >
+                          <Share2 size={15} strokeWidth={2.7} />
+                          {t("share")}
+                        </button>
+
+                        <Link
+                          to={`/seeker/jobs/${job.id}`}
+                          className="btn btn-primary compact-detail-btn"
+                        >
+                          {t("viewDetails")}
+                        </Link>
+                      </div>
                     </div>
                   </article>
                 );
@@ -302,9 +366,9 @@ function BrowseJobs() {
                   </div>
 
                   <p className="shop-name">
-                    {job.shop_profiles?.shop_name || t("localShop")}
+                    {getShopName(job)}
 
-                    {job.shop_profiles?.is_verified && (
+                    {isVerifiedJob(job) && (
                       <span className="verified-badge">{t("verified")}</span>
                     )}
                   </p>
@@ -321,6 +385,11 @@ function BrowseJobs() {
                     </p>
                     <p>
                       <strong>{t("location")}:</strong> {job.location}
+                    </p>
+                    <p>
+                      <span className="job-freshness-pill">
+                        {getExpiryText(job)}
+                      </span>
                     </p>
                   </div>
 
@@ -341,6 +410,15 @@ function BrowseJobs() {
                       {savedJobIds.includes(job.id)
                         ? t("removeSaved")
                         : t("saveJob")}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn whatsapp-share-btn"
+                      onClick={() => shareJobOnWhatsApp(job)}
+                    >
+                      <Share2 size={16} strokeWidth={2.7} />
+                      {t("shareOnWhatsApp")}
                     </button>
                   </div>
                 </div>
