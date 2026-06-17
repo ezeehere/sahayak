@@ -19,6 +19,8 @@ import OwnerDashboardPage from "./pages/owner/OwnerDashboard";
 import SeekerDashboardPage from "./pages/seeker/SeekerDashboard";
 import Home from "./pages/Home";
 import AuthCallback from "./pages/AuthCallback";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 
 
@@ -72,175 +74,8 @@ function Navbar() {
 }
 
 
-function Login() {
-  const navigate = useNavigate();
 
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
 
-  const [message, setMessage] = useState("");
-
-  async function handleLogin(e) {
-    e.preventDefault();
-    setMessage("Logging in...");
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email: form.email,
-      password: form.password,
-    });
-
-    if (error) {
-      setMessage(error.message);
-      return;
-    }
-
-    setMessage("Login successful.");
-    navigate("/dashboard");
-  }
-
-  return (
-    <main className="page-center">
-      <div className="auth-card">
-        <h1>Sahayak</h1>
-        <p className="subtitle">Login to your account</p>
-
-        {message && <div className="message">{message}</div>}
-
-        <form onSubmit={handleLogin}>
-          <label>Email</label>
-          <input
-            type="email"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            required
-          />
-
-          <label>Password</label>
-          <input
-            type="password"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            required
-          />
-
-          <button className="primary-btn" type="submit">
-            Login
-          </button>
-        </form>
-
-        <p className="form-bottom">
-          New user? <Link to="/register">Create account</Link>
-        </p>
-      </div>
-    </main>
-  );
-}
-
-function Register() {
-  const navigate = useNavigate();
-
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    password: "",
-    role: "seeker",
-  });
-
-  const [message, setMessage] = useState("");
-
-  async function handleRegister(e) {
-    e.preventDefault();
-    setMessage("Creating account...");
-
-    const { error } = await supabase.auth.signUp({
-      email: form.email,
-      password: form.password,
-      options: {
-        data: {
-          name: form.name,
-          phone: form.phone,
-          role: form.role,
-        },
-      },
-    });
-
-    if (error) {
-      setMessage(error.message);
-      return;
-    }
-
-    setMessage("Account created successfully. Redirecting to login...");
-
-    setTimeout(() => {
-      navigate("/login");
-    }, 800);
-  }
-
-  return (
-    <main className="page-center">
-      <div className="auth-card">
-        <h1>Sahayak</h1>
-        <p className="subtitle">Create your account</p>
-
-        {message && <div className="message">{message}</div>}
-
-        <form onSubmit={handleRegister}>
-          <label>Full Name</label>
-          <input
-            type="text"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            required
-          />
-
-          <label>Email</label>
-          <input
-            type="email"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            required
-          />
-
-          <label>Phone</label>
-          <input
-            type="text"
-            value={form.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-            required
-          />
-
-          <label>Password</label>
-          <input
-            type="password"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            required
-          />
-
-          <label>Role</label>
-          <select
-            value={form.role}
-            onChange={(e) => setForm({ ...form, role: e.target.value })}
-          >
-            <option value="seeker">Job Seeker</option>
-            <option value="owner">Shop Owner</option>
-          </select>
-
-          <button className="primary-btn" type="submit">
-            Create Account
-          </button>
-        </form>
-
-        <p className="form-bottom">
-          Already registered? <Link to="/login">Login</Link>
-        </p>
-      </div>
-    </main>
-  );
-}
 
 function ProtectedRoute({ children }) {
   const { session, loading } = useAuth();
@@ -487,6 +322,8 @@ function App() {
 
       <Route path="/register" element={<Register />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
       <Route
         path="/dashboard"
