@@ -7520,7 +7520,7 @@ textarea {
   fill: #166534;
 }
 
----------- SHARED ICON BOX ---------- */ .sx-icon-box {
+.sx-icon-box {
   width: 44px;
   height: 44px;
   border-radius: 15px;
