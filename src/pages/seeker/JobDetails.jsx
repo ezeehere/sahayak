@@ -29,6 +29,10 @@ import { trackJobEvent } from "../../utils/jobEvents";
 import { requireLoginForJobAction } from "../../utils/jobActionGate";
 import { getSeekerApplySetup } from "../../utils/seekerApplySetup";
 import MinimalApplySetupModal from "../../components/seeker/MinimalApplySetupModal";
+import JobFreshnessBadge from "../../components/jobs/JobFreshnessBadge";
+import JobFreshnessMeta from "../../components/jobs/JobFreshnessMeta";
+import { shouldAllowApply } from "../../utils/jobFreshness";
+import InAppMoment from "../../components/common/InAppMoment";
 
 function JobDetails() {
   const { id } = useParams();
@@ -51,12 +55,24 @@ function JobDetails() {
   const [applicationMode, setApplicationMode] = useState("new");
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigate = useNavigate();
-  
+
+  const jobMoments = [];
+  if (job?.status === "filled") {
+    jobMoments.push({
+      id: `job-filled-${job.id}`,
+      tone: "slate",
+      title: "This job is filled",
+      message: "This job is no longer accepting applications. Browse other nearby jobs instead.",
+      cta: "Browse jobs",
+      href: "/browse-jobs",
+    });
+  }
+
 
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
 
-  
+
 
   const actionHandledRef = useRef(false);
 
@@ -530,6 +546,8 @@ ${jobUrl}`;
       )}
 
       <main className="dashboard-section job-details-page">
+        <InAppMoment moments={jobMoments} />
+
         <div className="mobile-detail-topbar">
           <Link to="/browse-jobs" className="mobile-back-link">
             <ArrowLeft size={18} strokeWidth={2.8} />
@@ -554,15 +572,21 @@ ${jobUrl}`;
           <p className="tagline">{t("jobDetails")}</p>
 
           <div className="mobile-job-detail-head">
-            <h1>{job.title}</h1>
+            <div className="flex flex-wrap items-center gap-2" style={{ marginBottom: '8px', display: 'flex' }}>
+              <JobFreshnessBadge job={job} />
+              {isVerifiedJob() && (
+                <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-medium text-green-800 ring-1 ring-green-100">
+                  Verified offline shop
+                </span>
+              )}
+            </div>
 
-            <p className="mobile-shop-line detail-shop-line">
+            <h1 style={{ marginTop: '4px', marginBottom: '4px' }}>{job.title}</h1>
+            <JobFreshnessMeta job={job} />
+
+            <p className="mobile-shop-line detail-shop-line" style={{ marginTop: '8px' }}>
               <Store size={15} strokeWidth={2.6} />
               <span>{getShopName()}</span>
-
-              {isVerifiedJob() && (
-                <span className="tiny-verified">{t("verified")}</span>
-              )}
             </p>
           </div>
 
@@ -611,7 +635,11 @@ ${jobUrl}`;
               </div>
             )}
 
-            {alreadyApplied ? (
+            {!shouldAllowApply(job) ? (
+              <div className="rounded-2xl bg-slate-100 px-4 py-3 text-sm text-slate-700" style={{ width: "100%", gridColumn: "span 2", marginBottom: "12px", border: '1px solid var(--border)', borderRadius: '24px' }}>
+                This job is no longer accepting applications. You can browse other nearby jobs.
+              </div>
+            ) : alreadyApplied ? (
               <button className="btn btn-disabled" disabled>
                 {t("alreadyApplied")}
               </button>
@@ -640,19 +668,7 @@ ${jobUrl}`;
                 {t("callOwner")}
               </a>
 
-              {cleanPhone && (
-                <a
-                  href={whatsappLink}
-                  target={user ? "_blank" : undefined}
-                  rel={user ? "noopener noreferrer" : undefined}
-                  className="btn whatsapp-contact-btn"
-                  onClick={(e) => handleContactClick(e, "whatsapp")}
-                  style={{ backgroundColor: "#25D366", color: "#ffffff", borderColor: "#25D366" }}
-                >
-                  <MessageCircle size={17} strokeWidth={2.7} />
-                  WhatsApp
-                </a>
-              )}
+
 
               <button
                 type="button"
@@ -698,11 +714,7 @@ ${jobUrl}`;
               )}
             </div>
 
-            {isVerifiedJob() && (
-              <div className="verified-shop-note">
-                {t("verifiedShopTrustNote")}
-              </div>
-            )}
+
           </div>
 
           <section className="mobile-detail-section">

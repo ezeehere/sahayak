@@ -4,6 +4,8 @@ import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
 import Navbar from "../../components/Navbar";
 import { useLanguage } from "../../context/LanguageContext";
+import OwnerSetupProgress from "../../components/owner/OwnerSetupProgress";
+import OwnerFirstJobSuccessModal from "../../components/owner/OwnerFirstJobSuccessModal";
 
 function PostJob() {
   const { t } = useLanguage();
@@ -11,6 +13,12 @@ function PostJob() {
 
   const [shopProfile, setShopProfile] = useState(null);
   const [categories, setCategories] = useState([]);
+
+  const params = new URLSearchParams(window.location.search);
+  const firstJobMode = params.get("firstJob") === "1";
+
+  const [postedJob, setPostedJob] = useState(null);
+  const [showFirstJobSuccess, setShowFirstJobSuccess] = useState(false);
 
   const [form, setForm] = useState({
     title: "",
@@ -77,21 +85,25 @@ function PostJob() {
 
     setMessage(t("postingJob"));
 
-    const { error } = await supabase.from("jobs").insert({
-      owner_id: user.id,
-      shop_id: shopProfile.id,
-      title: form.title,
-      category: form.category,
-      description: form.description,
-      job_type: form.job_type,
-      salary: form.salary,
-      timing: form.timing,
-      location: form.location,
-      status: "approved",
-      hiring_status: "open",
-      expires_at: form.expiresAt || null,
-      last_checked_at: new Date().toISOString(),
-    });
+    const { data, error } = await supabase
+      .from("jobs")
+      .insert({
+        owner_id: user.id,
+        shop_id: shopProfile.id,
+        title: form.title,
+        category: form.category,
+        description: form.description,
+        job_type: form.job_type,
+        salary: form.salary,
+        timing: form.timing,
+        location: form.location,
+        status: "approved",
+        hiring_status: "open",
+        expires_at: form.expiresAt || null,
+        last_checked_at: new Date().toISOString(),
+      })
+      .select()
+      .maybeSingle();
 
     if (error) {
       console.log(error);
@@ -111,6 +123,16 @@ function PostJob() {
       location: "",
       expiresAt: "",
     });
+
+    if (firstJobMode) {
+      setPostedJob(data);
+      setShowFirstJobSuccess(true);
+      return;
+    }
+
+    setTimeout(() => {
+      window.location.href = "/owner/dashboard?focus=jobs";
+    }, 1000);
   }
 
   if (!user?.id || loading) {
@@ -170,6 +192,8 @@ function PostJob() {
             {t("postJobPageDesc")}
           </p>
         </div>
+
+        {firstJobMode && <OwnerSetupProgress currentStep={2} />}
 
         <div className="form-card wide-form">
           <h2>{t("hello")}, {profile?.name || t("owner")}</h2>
@@ -267,6 +291,14 @@ function PostJob() {
             </button>
           </form>
         </div>
+
+        {showFirstJobSuccess && postedJob && (
+          <OwnerFirstJobSuccessModal
+            job={postedJob}
+            shopName={shopProfile?.shop_name || "your shop"}
+            onClose={() => setShowFirstJobSuccess(false)}
+          />
+        )}
       </main>
     </>
   );

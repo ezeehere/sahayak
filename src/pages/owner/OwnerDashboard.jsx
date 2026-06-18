@@ -4,12 +4,37 @@ import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import Navbar from "../../components/Navbar";
+import { getOwnerSetupState } from "../../utils/ownerOnboarding";
+import { getOwnerApplicantDashboardData } from "../../utils/ownerApplicantData";
+import OwnerApplicantFirstPanel from "../../components/owner/OwnerApplicantFirstPanel";
+import MarkJobFilledPrompt from "../../components/owner/MarkJobFilledPrompt";
+import { shouldPromptMarkFilled } from "../../utils/jobFilledPrompt";
+import NextBestActionCards from "../../components/dashboard/NextBestActionCards";
+import { getOwnerNextBestActions } from "../../utils/nextBestActions";
+import InAppMoment from "../../components/common/InAppMoment";
+import { getOwnerMoments, getUrlNoticeMoment } from "../../utils/inAppMoments";
+import JobFreshnessBadge from "../../components/jobs/JobFreshnessBadge";
+import JobFreshnessMeta from "../../components/jobs/JobFreshnessMeta";
 
 function OwnerDashboard() {
   const { user, profile } = useAuth();
   const { t } = useLanguage();
 
   const [shopProfile, setShopProfile] = useState(null);
+
+  const [ownerApplicantData, setOwnerApplicantData] = useState({
+    jobs: [],
+    applicants: [],
+    stats: {
+      totalJobs: 0,
+      totalApplicants: 0,
+      unreadApplicants: 0,
+      pendingApplicants: 0,
+      shortlistedApplicants: 0,
+    },
+  });
+
+  const [loadingApplicants, setLoadingApplicants] = useState(true);
 
   const [stats, setStats] = useState({
     totalJobs: 0,
@@ -25,6 +50,75 @@ function OwnerDashboard() {
 
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [checkingSetup, setCheckingSetup] = useState(true);
+
+  const params = new URLSearchParams(window.location.search);
+  const focus = params.get("focus");
+  const shouldShowApplicantsFirst = focus === "applicants" || ownerApplicantData.applicants.length > 0;
+
+  const [dismissedFilledPrompts, setDismissedFilledPrompts] = useState([]);
+
+  const jobsNeedingFilledPrompt = ownerApplicantData.jobs.filter((job) => {
+    const jobApplicants = ownerApplicantData.applicants.filter(
+      (applicant) => applicant.job_id === job.id
+    );
+
+    const dismissed = dismissedFilledPrompts.includes(job.id);
+
+    return !dismissed && shouldPromptMarkFilled({
+      job,
+      applicants: jobApplicants,
+    });
+  });
+
+  const ownerNextActions = getOwnerNextBestActions({
+    jobs: ownerApplicantData.jobs,
+    applicants: ownerApplicantData.applicants,
+    stats: ownerApplicantData.stats,
+  });
+
+  const urlNoticeMoment = getUrlNoticeMoment();
+
+  const ownerMoments = [
+    ...(urlNoticeMoment ? [urlNoticeMoment] : []),
+    ...getOwnerMoments({
+      applicants: ownerApplicantData.applicants,
+      stats: ownerApplicantData.stats,
+    }),
+  ];
+
+  useEffect(() => {
+    async function checkOwnerSetupAndLoadDashboard() {
+      const {
+        data: { user: authUser },
+      } = await supabase.auth.getUser();
+
+      if (!authUser) {
+        window.location.href = "/login";
+        return;
+      }
+
+      const state = await getOwnerSetupState(authUser.id);
+
+      if (!state.hasShopProfile) {
+        window.location.replace("/owner/shop-profile?setup=1");
+        return;
+      }
+
+      if (!state.hasJobs) {
+        window.location.replace("/owner/post-job?firstJob=1");
+        return;
+      }
+
+      const applicantData = await getOwnerApplicantDashboardData(authUser.id);
+      setOwnerApplicantData(applicantData);
+
+      setLoadingApplicants(false);
+      setCheckingSetup(false);
+    }
+
+    checkOwnerSetupAndLoadDashboard();
+  }, []);
 
   useEffect(() => {
     if (user?.id) {
@@ -110,6 +204,20 @@ function OwnerDashboard() {
     );
   }
 
+  if (checkingSetup) {
+    return (
+      <>
+        <Navbar />
+
+        <main className="dashboard-section">
+          <div className="dashboard-card" style={{ background: "white" }}>
+            <p style={{ color: "var(--muted)" }}>Checking your shop setup...</p>
+          </div>
+        </main>
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar />
@@ -148,6 +256,8 @@ function OwnerDashboard() {
 
         {message && <div className="message">{message}</div>}
 
+        <InAppMoment moments={ownerMoments} />
+
         {!shopProfile && (
           <div className="mobile-alert-card">
             <div>
@@ -160,6 +270,47 @@ function OwnerDashboard() {
             </Link>
           </div>
         )}
+
+        {loadingApplicants ? (
+          <div style={{ margin: "24px 0" }}>
+            <section className="dashboard-card" style={{ background: "white" }}>
+              <p style={{ color: "var(--muted)" }}>Loading applicants...</p>
+            </section>
+          </div>
+        ) : shouldShowApplicantsFirst ? (
+          <div style={{ margin: "24px 0" }}>
+            <OwnerApplicantFirstPanel
+              applicants={ownerApplicantData.applicants}
+              stats={ownerApplicantData.stats}
+            />
+          </div>
+        ) : null}
+
+        {jobsNeedingFilledPrompt.map((job) => (
+          <div key={job.id} style={{ margin: "24px 0" }}>
+            <MarkJobFilledPrompt
+              job={job}
+              onMarkedFilled={(updatedJob) => {
+                setOwnerApplicantData((prev) => ({
+                  ...prev,
+                  jobs: prev.jobs.map((item) =>
+                    item.id === updatedJob.id ? updatedJob : item
+                  ),
+                }));
+              }}
+              onDismiss={() => {
+                setDismissedFilledPrompts((prev) => [...prev, job.id]);
+              }}
+            />
+          </div>
+        ))}
+
+        <div style={{ margin: "24px 0" }}>
+          <NextBestActionCards
+            title="What needs your attention"
+            actions={ownerNextActions}
+          />
+        </div>
 
         <div className="mobile-stat-strip owner-mobile-stats">
           <div className="mobile-stat-chip">
@@ -318,17 +469,20 @@ function OwnerDashboard() {
           ) : (
             <div className="mobile-list">
               {recentJobs.map((job) => (
-                <Link to="/owner/jobs" className="mobile-list-row" key={job.id}>
-                  <div>
-                    <h3>{job.title}</h3>
-                    <p>
-                      {job.category} • {job.location} • {job.salary}
-                    </p>
-                  </div>
+                <Link to="/owner/jobs" className="mobile-list-row" key={job.id} style={{ display: 'block', padding: '16px 20px' }}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="font-semibold text-slate-900" style={{ margin: 0 }}>
+                        {job.title}
+                      </h3>
+                      <JobFreshnessMeta job={job} />
+                      <p style={{ marginTop: '4px', fontSize: '13px', color: 'var(--muted)' }}>
+                        {job.category} • {job.location} • {job.salary}
+                      </p>
+                    </div>
 
-                  <span className={`status-badge status-${job.status}`}>
-                    {t(job.status)}
-                  </span>
+                    <JobFreshnessBadge job={job} />
+                  </div>
                 </Link>
               ))}
             </div>
@@ -356,17 +510,20 @@ function OwnerDashboard() {
             ) : (
               <div className="admin-list">
                 {recentJobs.map((job) => (
-                  <div className="admin-list-item" key={job.id}>
-                    <div>
-                      <h3>{job.title}</h3>
-                      <p>
-                        {job.category} • {job.location} • {job.salary}
-                      </p>
-                    </div>
+                  <div className="admin-list-item" key={job.id} style={{ display: 'block', padding: '16px 20px' }}>
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h3 className="font-semibold text-slate-900" style={{ margin: 0 }}>
+                          {job.title}
+                        </h3>
+                        <JobFreshnessMeta job={job} />
+                        <p style={{ marginTop: '4px', fontSize: '13px', color: 'var(--muted)' }}>
+                          {job.category} • {job.location} • {job.salary}
+                        </p>
+                      </div>
 
-                    <span className={`status-badge status-${job.status}`}>
-                      {t(job.status)}
-                    </span>
+                      <JobFreshnessBadge job={job} />
+                    </div>
                   </div>
                 ))}
               </div>

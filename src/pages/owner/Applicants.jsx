@@ -4,12 +4,22 @@ import { useAuth } from "../../context/AuthContext";
 import Navbar from "../../components/Navbar";
 import { useLanguage } from "../../context/LanguageContext";
 import ApplicantCard from "../../components/ApplicantCard";
+import { markApplicationAsSeen } from "../../utils/ownerApplicantData";
 
 function Applicants() {
   const { t } = useLanguage();
   const { user } = useAuth();
 
   const [applications, setApplications] = useState([]);
+
+  const params = new URLSearchParams(window.location.search);
+  const selectedApplicationId = params.get("application");
+
+  useEffect(() => {
+    if (selectedApplicationId) {
+      markApplicationAsSeen(selectedApplicationId);
+    }
+  }, [selectedApplicationId]);
   const [seekerProfilesMap, setSeekerProfilesMap] = useState({});
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);

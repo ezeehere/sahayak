@@ -7501,3 +7501,19 @@ textarea {
     font-size: 22px;
   }
 }
+
+.success-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  background: #ecfdf5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: #166534;
+}

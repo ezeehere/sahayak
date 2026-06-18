@@ -1,4 +1,4 @@
-import { supabase } from "../lib/supabase";
+import { supabase } from "../supabaseClient";
 import {
   getPendingJobAction,
   clearPendingJobAction,
@@ -10,11 +10,11 @@ const ROUTES = {
   browseJobs: "/browse-jobs",
 
   seekerDashboard: "/seeker/dashboard",
-  matchingJobs: "/seeker/dashboard",
+  matchingJobs: "/seeker/matching-jobs",
 
   ownerDashboard: "/owner/dashboard",
-  ownerShopProfile: "/owner/shop-profile",
-  ownerPostJob: "/owner/post-job",
+  ownerShopProfile: "/owner/shop-profile?setup=1",
+  ownerPostJob: "/owner/post-job?firstJob=1",
 
   adminDashboard: "/admin/dashboard",
 
@@ -32,7 +32,7 @@ const DB = {
   applicationJobId: "job_id",
 
   jobPreferences: "job_preferences",
-  jobPreferencesUserId: "seeker_id",
+  jobPreferencesUserId: "user_id",
 
   shopProfiles: "shop_profiles",
   shopOwnerId: "owner_id",
@@ -40,20 +40,6 @@ const DB = {
   jobs: "jobs",
   jobOwnerId: "owner_id",
 };
-
-async function hasAnyRow(query) {
-  const { count, error } = await query.select("id", {
-    count: "exact",
-    head: true,
-  });
-
-  if (error) {
-    console.error("Smart entry check failed:", error.message);
-    return false;
-  }
-
-  return (count || 0) > 0;
-}
 
 async function getProfile(userId) {
   const { data, error } = await supabase
@@ -70,28 +56,46 @@ async function getProfile(userId) {
   return data;
 }
 
-async function seekerHasApplications(userId) {
-  return hasAnyRow(
-    supabase
-      .from(DB.applications)
-      .eq(DB.applicationSeekerId, userId)
-  );
+async function hasSeekerApplications(userId) {
+  const { count, error } = await supabase
+    .from(DB.applications)
+    .select("id", { count: "exact", head: true })
+    .eq(DB.applicationSeekerId, userId);
+
+  if (error) {
+    console.error("Seeker applications check failed:", error.message);
+    return false;
+  }
+
+  return (count || 0) > 0;
 }
 
-async function seekerHasPreferences(userId) {
-  return hasAnyRow(
-    supabase
-      .from(DB.jobPreferences)
-      .eq(DB.jobPreferencesUserId, userId)
-  );
+async function hasSeekerPreferences(userId) {
+  const { count, error } = await supabase
+    .from(DB.jobPreferences)
+    .select("id", { count: "exact", head: true })
+    .eq(DB.jobPreferencesUserId, userId);
+
+  if (error) {
+    console.error("Seeker preferences check failed:", error.message);
+    return false;
+  }
+
+  return (count || 0) > 0;
 }
 
-async function ownerHasShopProfile(userId) {
-  return hasAnyRow(
-    supabase
-      .from(DB.shopProfiles)
-      .eq(DB.shopOwnerId, userId)
-  );
+async function hasOwnerShopProfile(userId) {
+  const { count, error } = await supabase
+    .from(DB.shopProfiles)
+    .select("id", { count: "exact", head: true })
+    .eq(DB.shopOwnerId, userId);
+
+  if (error) {
+    console.error("Owner shop profile check failed:", error.message);
+    return false;
+  }
+
+  return (count || 0) > 0;
 }
 
 async function getOwnerJobIds(userId) {
@@ -109,81 +113,109 @@ async function getOwnerJobIds(userId) {
   return data?.map((job) => job.id) || [];
 }
 
-async function ownerHasApplicants(jobIds) {
+async function hasOwnerApplicants(jobIds) {
   if (!jobIds.length) return false;
 
-  return hasAnyRow(
-    supabase
-      .from(DB.applications)
-      .in(DB.applicationJobId, jobIds)
-  );
+  const { count, error } = await supabase
+    .from(DB.applications)
+    .select("id", { count: "exact", head: true })
+    .in(DB.applicationJobId, jobIds);
+
+  if (error) {
+    console.error("Owner applicants check failed:", error.message);
+    return false;
+  }
+
+  return (count || 0) > 0;
+}
+
+function normalizeRole(role) {
+  if (!role) return null;
+
+  const value = String(role).toLowerCase();
+
+  if (value === "job_seeker") return "seeker";
+  if (value === "shop_owner") return "owner";
+
+  return value;
 }
 
 export async function getUserNextRoute(user) {
-  if (!user?.id) return ROUTES.login;
+  try {
+    if (!user?.id) return ROUTES.login;
 
-  const profile = await getProfile(user.id);
-  const role = profile?.[DB.profileRole];
+    const profile = await getProfile(user.id);
 
-  const pendingAction = getPendingJobAction();
+    if (!profile) {
+      console.warn("No profile found. Sending user to browse jobs.");
+      return ROUTES.browseJobs;
+    }
 
-  if (role === "admin") {
-    clearPendingJobAction();
-    return ROUTES.adminDashboard;
-  }
+    const role = normalizeRole(profile[DB.profileRole]);
+    const pendingAction = getPendingJobAction();
 
-  if (role === "owner") {
-    if (pendingAction?.type === "apply") {
+    if (role === "admin") {
       clearPendingJobAction();
-      return ROUTES.ownerBlockedApply;
+      return ROUTES.adminDashboard;
     }
 
-    const hasShop = await ownerHasShopProfile(user.id);
+    if (role === "owner") {
+      if (pendingAction?.type === "apply") {
+        clearPendingJobAction();
+        return ROUTES.ownerBlockedApply;
+      }
 
-    if (!hasShop) {
-      return ROUTES.ownerShopProfile;
+      const hasShop = await hasOwnerShopProfile(user.id);
+
+      if (!hasShop) {
+        return ROUTES.ownerShopProfile;
+      }
+
+      const jobIds = await getOwnerJobIds(user.id);
+
+      if (!jobIds.length) {
+        return ROUTES.ownerPostJob;
+      }
+
+      const hasApplicants = await hasOwnerApplicants(jobIds);
+
+      if (hasApplicants) {
+        return `${ROUTES.ownerDashboard}?focus=applicants`;
+      }
+
+      return ROUTES.ownerDashboard;
     }
 
-    const jobIds = await getOwnerJobIds(user.id);
+    if (role === "seeker") {
+      if (pendingAction?.jobId && pendingAction?.type) {
+        const nextRoute = ROUTES.jobWithAction(
+          pendingAction.jobId,
+          pendingAction.type
+        );
 
-    if (!jobIds.length) {
-      return ROUTES.ownerPostJob;
+        clearPendingJobAction();
+        return nextRoute;
+      }
+
+      const hasApplications = await hasSeekerApplications(user.id);
+
+      if (hasApplications) {
+        return `${ROUTES.seekerDashboard}?focus=status`;
+      }
+
+      const hasPreferences = await hasSeekerPreferences(user.id);
+
+      if (hasPreferences) {
+        return ROUTES.matchingJobs;
+      }
+
+      return ROUTES.browseJobs;
     }
 
-    const hasApplicants = await ownerHasApplicants(jobIds);
-
-    if (hasApplicants) {
-      return `${ROUTES.ownerDashboard}?focus=applicants`;
-    }
-
-    return ROUTES.ownerDashboard;
-  }
-
-  if (role === "seeker") {
-    if (pendingAction?.jobId && pendingAction?.type) {
-      const nextRoute = ROUTES.jobWithAction(
-        pendingAction.jobId,
-        pendingAction.type
-      );
-
-      clearPendingJobAction();
-      return nextRoute;
-    }
-
-    const hasApplications = await seekerHasApplications(user.id);
-
-    if (hasApplications) {
-      return `${ROUTES.seekerDashboard}?focus=status`;
-    }
-
-    const hasPreferences = await seekerHasPreferences(user.id);
-
-    if (hasPreferences) {
-      return ROUTES.matchingJobs;
-    }
-
+    console.warn("Unknown role:", role);
+    return ROUTES.browseJobs;
+  } catch (error) {
+    console.error("Smart entry route failed:", error);
     return ROUTES.browseJobs;
   }
-
-  return ROUTES.browseJobs;
 }

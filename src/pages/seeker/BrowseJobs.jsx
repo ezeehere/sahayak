@@ -15,6 +15,8 @@ import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import Navbar from "../../components/Navbar";
 import { requireLoginForJobAction } from "../../utils/jobActionGate";
+import JobFreshnessBadge from "../../components/jobs/JobFreshnessBadge";
+import JobFreshnessMeta from "../../components/jobs/JobFreshnessMeta";
 
 function BrowseJobs() {
   const { user } = useAuth();
@@ -104,7 +106,12 @@ ${jobUrl}`;
       console.log(jobError);
       setMessage(jobError.message);
     } else {
-      setJobs(jobData || []);
+      const now = new Date();
+      const visibleJobs = (jobData || []).filter((job) => {
+        if (!job.expires_at) return true;
+        return new Date(job.expires_at) >= now;
+      });
+      setJobs(visibleJobs);
     }
 
     const { data: categoryData, error: categoryError } = await supabase
@@ -276,11 +283,16 @@ ${jobUrl}`;
 
                 return (
                   <article className="mobile-job-card" key={job.id}>
-                    <div className="mobile-job-top">
-                      <div>
-                        <h3>{job.title}</h3>
+                    <div className="mobile-job-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
+                      <div style={{ flex: 1 }}>
+                        <div className="flex items-start justify-between gap-3" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '6px' }}>
+                          <h3 className="text-base font-semibold text-slate-900" style={{ margin: 0 }}>
+                            {job.title}
+                          </h3>
+                          <JobFreshnessBadge job={job} />
+                        </div>
 
-                        <p className="mobile-shop-line">
+                        <p className="mobile-shop-line" style={{ margin: '4px 0 8px 0' }}>
                           <Store size={14} strokeWidth={2.6} />
                           <span>{getShopName(job)}</span>
 
@@ -288,6 +300,8 @@ ${jobUrl}`;
                             <span className="tiny-verified">{t("verified")}</span>
                           )}
                         </p>
+
+                        <JobFreshnessMeta job={job} />
                       </div>
 
                       <button
@@ -299,6 +313,7 @@ ${jobUrl}`;
                         }
                         onClick={() => toggleSavedJob(job.id)}
                         aria-label={saved ? t("removeSaved") : t("saveJob")}
+                        style={{ marginLeft: '12px', flexShrink: 0 }}
                       >
                         {saved ? (
                           <BookmarkCheck size={20} strokeWidth={2.7} />
@@ -322,10 +337,6 @@ ${jobUrl}`;
                       <span>
                         <MapPin size={14} strokeWidth={2.6} />
                         {job.location}
-                      </span>
-
-                      <span className="job-freshness-pill">
-                        {getExpiryText(job)}
                       </span>
                     </div>
 
@@ -364,12 +375,18 @@ ${jobUrl}`;
             <div className="desktop-job-grid-only job-grid">
               {filteredJobs.map((job) => (
                 <div className="job-card" key={job.id}>
-                  <div className="job-top">
-                    <h3>{job.title}</h3>
-                    <span className="status-badge">{job.job_type}</span>
+                  <div className="job-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', marginBottom: '8px' }}>
+                    <div style={{ flex: 1 }}>
+                      <h3 style={{ margin: 0 }}>{job.title}</h3>
+                      <JobFreshnessMeta job={job} />
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+                      <span className="status-badge" style={{ margin: 0 }}>{job.job_type}</span>
+                      <JobFreshnessBadge job={job} />
+                    </div>
                   </div>
 
-                  <p className="shop-name">
+                  <p className="shop-name" style={{ marginTop: '8px', marginBottom: '8px' }}>
                     {getShopName(job)}
 
                     {isVerifiedJob(job) && (
@@ -389,11 +406,6 @@ ${jobUrl}`;
                     </p>
                     <p>
                       <strong>{t("location")}:</strong> {job.location}
-                    </p>
-                    <p>
-                      <span className="job-freshness-pill">
-                        {getExpiryText(job)}
-                      </span>
                     </p>
                   </div>
 

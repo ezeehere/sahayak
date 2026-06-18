@@ -6,6 +6,12 @@ import { useLanguage } from "../../context/LanguageContext";
 import Navbar from "../../components/Navbar";
 import ProfileStrengthCard from "../../components/ProfileStrengthCard";
 import MatchingJobs from "../../components/MatchingJobs";
+import SeekerStatusFirstPanel from "../../components/seeker/SeekerStatusFirstPanel";
+import { getRecentSeekerApplications } from "../../utils/seekerDashboardData";
+import NextBestActionCards from "../../components/dashboard/NextBestActionCards";
+import { getSeekerNextBestActions } from "../../utils/nextBestActions";
+import InAppMoment from "../../components/common/InAppMoment";
+import { getSeekerMoments } from "../../utils/inAppMoments";
 
 function SeekerDashboard() {
   const { user, profile } = useAuth();
@@ -23,6 +29,43 @@ function SeekerDashboard() {
   const [seekerProfile, setSeekerProfile] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const [applications, setApplications] = useState([]);
+  const [loadingApplications, setLoadingApplications] = useState(true);
+
+  const seekerNextActions = getSeekerNextBestActions({
+    applications,
+  });
+
+  const seekerMoments = getSeekerMoments({
+    applications,
+  });
+
+  const params = new URLSearchParams(window.location.search);
+  const focus = params.get("focus");
+  const shouldShowStatusFirst = focus === "status" || applications.length > 0;
+
+  useEffect(() => {
+    async function loadSeekerDashboard() {
+      setLoadingApplications(true);
+
+      const {
+        data: { user: authUser },
+      } = await supabase.auth.getUser();
+
+      if (!authUser) {
+        window.location.href = "/login";
+        return;
+      }
+
+      const recentApplications = await getRecentSeekerApplications(authUser.id);
+      setApplications(recentApplications);
+
+      setLoadingApplications(false);
+    }
+
+    loadSeekerDashboard();
+  }, []);
 
   useEffect(() => {
     if (user?.id) {
@@ -137,6 +180,8 @@ function SeekerDashboard() {
 
         {message && <div className="message">{message}</div>}
 
+        <InAppMoment moments={seekerMoments} />
+
         {!stats.profileCompleted && (
           <div className="mobile-alert-card">
             <div>
@@ -168,6 +213,46 @@ function SeekerDashboard() {
         </div>
 
         <ProfileStrengthCard profile={profile} seekerProfile={seekerProfile} />
+
+        <div style={{ margin: "24px 0" }}>
+          <NextBestActionCards
+            title="What to do next"
+            actions={seekerNextActions}
+          />
+        </div>
+
+        <div style={{ margin: "24px 0" }}>
+          {loadingApplications ? (
+            <section className="dashboard-card" style={{ background: "white" }}>
+              <p style={{ color: "var(--muted)" }}>Loading your applications...</p>
+            </section>
+          ) : shouldShowStatusFirst ? (
+            <SeekerStatusFirstPanel applications={applications} />
+          ) : (
+            applications.length === 0 && (
+              <section className="dashboard-card" style={{ background: "white" }}>
+                <p className="tagline" style={{ background: "var(--green)" }}>Start applying</p>
+
+                <h2 style={{ fontSize: "28px", letterSpacing: "-1px", fontWeight: 900, marginTop: "12px" }}>
+                  Find nearby local jobs
+                </h2>
+
+                <p style={{ color: "var(--muted)", marginTop: "10px", lineHeight: 1.6 }}>
+                  Browse shop jobs near you and apply in a few steps.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={() => (window.location.href = "/browse-jobs")}
+                  className="btn btn-primary"
+                  style={{ marginTop: "20px" }}
+                >
+                  Browse jobs
+                </button>
+              </section>
+            )
+          )}
+        </div>
 
         <MatchingJobs />
 

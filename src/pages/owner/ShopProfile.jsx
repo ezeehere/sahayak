@@ -3,10 +3,14 @@ import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabase";
 import Navbar from "../../components/Navbar";
 import { useLanguage } from "../../context/LanguageContext";
+import OwnerSetupProgress from "../../components/owner/OwnerSetupProgress";
 
 function ShopProfile() {
   const { t } = useLanguage();
   const { user, profile } = useAuth();
+
+  const params = new URLSearchParams(window.location.search);
+  const setupMode = params.get("setup") === "1";
 
   const [categories, setCategories] = useState([]);
 
@@ -94,6 +98,14 @@ function ShopProfile() {
     }
 
     setMessage(t("shopProfileSavedSuccess"));
+
+    setTimeout(() => {
+      if (setupMode) {
+        window.location.replace("/owner/post-job?firstJob=1");
+      } else {
+        window.location.replace("/owner/dashboard");
+      }
+    }, 1000);
   }
 
   if (loading) {
@@ -122,6 +134,8 @@ function ShopProfile() {
             {t("shopProfilePageDesc")}
           </p>
         </div>
+
+        {setupMode && <OwnerSetupProgress currentStep={1} />}
 
         <div className="form-card wide-form">
           <h2>{t("hello")}, {profile?.name}</h2>
