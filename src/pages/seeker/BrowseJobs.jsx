@@ -15,8 +15,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useLanguage } from "../../context/LanguageContext";
 import Navbar from "../../components/Navbar";
 import { requireLoginForJobAction } from "../../utils/jobActionGate";
-import JobFreshnessBadge from "../../components/jobs/JobFreshnessBadge";
-import JobFreshnessMeta from "../../components/jobs/JobFreshnessMeta";
+import JobFreshnessLine from "../../components/jobs/JobFreshnessLine";
 
 function BrowseJobs() {
   const { user } = useAuth();
@@ -285,42 +284,44 @@ ${jobUrl}`;
                   <article className="mobile-job-card" key={job.id}>
                     <div className="mobile-job-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
                       <div style={{ flex: 1 }}>
-                        <div className="flex items-start justify-between gap-3" style={{ display: 'flex', justifyContent: 'space-between', width: '100%', marginBottom: '6px' }}>
-                          <h3 className="text-base font-semibold text-slate-900" style={{ margin: 0 }}>
-                            {job.title}
-                          </h3>
-                          <JobFreshnessBadge job={job} />
-                        </div>
+                        <h3 className="text-base font-semibold text-slate-900" style={{ margin: '0 0 4px 0' }}>
+                          {job.title}
+                        </h3>
 
-                        <p className="mobile-shop-line" style={{ margin: '4px 0 8px 0' }}>
+                        <p className="mobile-shop-line" style={{ margin: '4px 0 8px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <Store size={14} strokeWidth={2.6} />
                           <span>{getShopName(job)}</span>
 
                           {isVerifiedJob(job) && (
-                            <span className="tiny-verified">{t("verified")}</span>
+                            <span className="tiny-verified" style={{ margin: 0 }}>{t("verified")}</span>
                           )}
                         </p>
 
-                        <JobFreshnessMeta job={job} />
+                        <JobFreshnessLine job={job} />
                       </div>
 
-                      <button
-                        type="button"
-                        className={
-                          saved
-                            ? "mobile-save-button saved"
-                            : "mobile-save-button"
-                        }
-                        onClick={() => toggleSavedJob(job.id)}
-                        aria-label={saved ? t("removeSaved") : t("saveJob")}
-                        style={{ marginLeft: '12px', flexShrink: 0 }}
-                      >
-                        {saved ? (
-                          <BookmarkCheck size={20} strokeWidth={2.7} />
-                        ) : (
-                          <Bookmark size={20} strokeWidth={2.7} />
-                        )}
-                      </button>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px', marginLeft: '12px', flexShrink: 0 }}>
+                        <span className="status-badge" style={{ margin: 0 }}>
+                          {job.job_type || "Job"}
+                        </span>
+
+                        <button
+                          type="button"
+                          className={
+                            saved
+                              ? "mobile-save-button saved"
+                              : "mobile-save-button"
+                          }
+                          onClick={() => toggleSavedJob(job.id)}
+                          aria-label={saved ? t("removeSaved") : t("saveJob")}
+                        >
+                          {saved ? (
+                            <BookmarkCheck size={20} strokeWidth={2.7} />
+                          ) : (
+                            <Bookmark size={20} strokeWidth={2.7} />
+                          )}
+                        </button>
+                      </div>
                     </div>
 
                     <div className="mobile-job-meta">
@@ -375,24 +376,25 @@ ${jobUrl}`;
             <div className="desktop-job-grid-only job-grid">
               {filteredJobs.map((job) => (
                 <div className="job-card" key={job.id}>
-                  <div className="job-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', marginBottom: '8px' }}>
+                  <div className="job-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
                     <div style={{ flex: 1 }}>
                       <h3 style={{ margin: 0 }}>{job.title}</h3>
-                      <JobFreshnessMeta job={job} />
+
+                      <p className="shop-name" style={{ marginTop: '8px', marginBottom: '8px' }}>
+                        {getShopName(job)}
+
+                        {isVerifiedJob(job) && (
+                          <span className="verified-badge">{t("verified")}</span>
+                        )}
+                      </p>
+
+                      <JobFreshnessLine job={job} />
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
-                      <span className="status-badge" style={{ margin: 0 }}>{job.job_type}</span>
-                      <JobFreshnessBadge job={job} />
-                    </div>
+
+                    <span className="status-badge" style={{ margin: 0 }}>
+                      {job.job_type || "Job"}
+                    </span>
                   </div>
-
-                  <p className="shop-name" style={{ marginTop: '8px', marginBottom: '8px' }}>
-                    {getShopName(job)}
-
-                    {isVerifiedJob(job) && (
-                      <span className="verified-badge">{t("verified")}</span>
-                    )}
-                  </p>
 
                   <div className="job-info">
                     <p>

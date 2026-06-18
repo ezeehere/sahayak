@@ -1,5 +1,3 @@
-import "./NextBestActionCards.css";
-
 function ActionIcon({ type = "default" }) {
   const icons = {
     applicants: (

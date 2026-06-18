@@ -6762,6 +6762,7 @@ textarea {
 }
 
 @media (max-width: 760px) {
+
   .preferences-card,
   .matching-jobs-card,
   .preferences-help-card {
@@ -6827,7 +6828,7 @@ textarea {
   box-shadow: 0 14px 36px rgba(17, 17, 17, 0.05);
 }
 
-.analytics-stat-card > span {
+.analytics-stat-card>span {
   width: 44px;
   height: 44px;
   border-radius: 16px;
@@ -7336,6 +7337,7 @@ textarea {
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
@@ -7516,4 +7518,651 @@ textarea {
   width: 24px;
   height: 24px;
   fill: #166534;
+}
+
+---------- SHARED ICON BOX ---------- */ .sx-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: 15px;
+  background: #fff8cc;
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.sx-icon-box svg {
+  width: 22px;
+  height: 22px;
+  color: #111111;
+  stroke: currentColor;
+}
+
+/* ---------- NEXT BEST ACTION CARDS ---------- */
+
+.nba-section {
+  width: 100%;
+  margin: 26px 0;
+}
+
+.nba-header {
+  margin-bottom: 16px;
+}
+
+.nba-kicker {
+  margin: 0 0 6px;
+  color: #667085 !important;
+  font-size: 14px;
+  font-weight: 650 !important;
+}
+
+.nba-header h2 {
+  margin: 0;
+  color: #111111;
+  font-size: clamp(26px, 3.5vw, 42px);
+  line-height: 1.05;
+  letter-spacing: -0.045em;
+  font-weight: 780 !important;
+}
+
+.nba-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.nba-card {
+  width: 100%;
+  min-height: 178px;
+  border-radius: 28px;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+  padding: 24px;
+  text-align: left;
+  cursor: pointer;
+  color: #111111;
+  box-shadow: 0 18px 45px rgba(17, 17, 17, 0.06);
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease;
+}
+
+.nba-card:nth-child(1) {
+  background: rgba(255, 248, 204, 0.92);
+}
+
+.nba-card:nth-child(2) {
+  background: rgba(234, 255, 216, 0.92);
+}
+
+.nba-card:nth-child(3) {
+  background: rgba(232, 240, 255, 0.92);
+}
+
+.nba-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(17, 17, 17, 0.22);
+  box-shadow: 0 24px 55px rgba(17, 17, 17, 0.09);
+}
+
+.nba-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  display: grid;
+  place-items: center;
+  margin-bottom: 18px;
+}
+
+.nba-icon svg {
+  width: 22px;
+  height: 22px;
+  fill: #111111;
+}
+
+.nba-card-content h3 {
+  margin: 0;
+  color: #111111;
+  font-size: 22px;
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+  font-weight: 760 !important;
+}
+
+.nba-card-content p {
+  margin: 9px 0 0;
+  color: #667085 !important;
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: 500 !important;
+}
+
+.nba-cta {
+  margin-top: auto;
+  padding-top: 20px;
+  color: #111111 !important;
+  font-size: 14px;
+  font-weight: 760 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.nba-cta::after {
+  content: "→";
+  font-weight: 800;
+}
+
+@media (max-width: 900px) {
+  .nba-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nba-card {
+    min-height: auto;
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .nba-card-content h3 {
+    font-size: 20px;
+  }
+}
+
+/* ---------- IN APP MOMENTS ---------- */
+
+.in-app-moment {
+  width: 100%;
+  margin: 0 0 18px;
+  border-radius: 26px;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+  padding: 18px;
+  box-shadow: 0 18px 45px rgba(17, 17, 17, 0.06);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.in-app-moment.blue {
+  background: #eef4ff;
+  border-color: rgba(23, 92, 211, 0.14);
+}
+
+.in-app-moment.green {
+  background: #eef8e8;
+  border-color: rgba(37, 108, 43, 0.16);
+}
+
+.in-app-moment.amber {
+  background: #fff8cc;
+  border-color: rgba(122, 90, 0, 0.14);
+}
+
+.in-app-moment.slate {
+  background: #f8f6ef;
+}
+
+.in-app-moment-main {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.in-app-moment-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 15px;
+  background: #ffffff;
+  border: 1px solid rgba(17, 17, 17, 0.1);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.in-app-moment-icon svg {
+  width: 21px;
+  height: 21px;
+  color: #111111;
+  stroke: currentColor;
+}
+
+.in-app-moment h3 {
+  margin: 0 0 5px;
+  color: #111111;
+  font-size: 18px;
+  letter-spacing: -0.035em;
+  font-weight: 760 !important;
+}
+
+.in-app-moment p {
+  margin: 0;
+  color: #667085 !important;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 500 !important;
+}
+
+.in-app-moment-actions {
+  display: flex;
+  gap: 9px;
+  flex-shrink: 0;
+}
+
+.in-app-moment-action,
+.in-app-moment-dismiss {
+  min-height: 38px;
+  border-radius: 999px;
+  padding: 0 14px;
+  border: 1px solid rgba(17, 17, 17, 0.12);
+  background: #ffffff;
+  color: #111111;
+  font-family: inherit;
+  font-size: 13.5px;
+  font-weight: 720 !important;
+  cursor: pointer;
+  box-shadow: none !important;
+}
+
+.in-app-moment-action {
+  background: #ffd93d;
+  border-color: rgba(17, 17, 17, 0.18);
+}
+
+.in-app-moment-dismiss {
+  background: rgba(255, 255, 255, 0.65);
+  color: #667085;
+}
+
+.in-app-moment-action:hover,
+.in-app-moment-dismiss:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 760px) {
+  .in-app-moment {
+    display: grid;
+    gap: 14px;
+    border-radius: 24px;
+    padding: 16px;
+  }
+
+  .in-app-moment-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+}
+
+/* ---------- MARK JOB AS FILLED PROMPT ---------- */
+
+.mark-filled-prompt {
+  width: 100%;
+  margin: 20px 0;
+  border-radius: 28px;
+  border: 1px solid rgba(37, 108, 43, 0.16);
+  background: linear-gradient(135deg, #eef8e8, #fff8cc);
+  padding: 22px;
+  box-shadow: 0 18px 45px rgba(17, 17, 17, 0.06);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.mark-filled-prompt-main {
+  display: flex;
+  gap: 13px;
+  align-items: flex-start;
+}
+
+.mark-filled-prompt-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid rgba(37, 108, 43, 0.16);
+  color: #256c2b;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.mark-filled-prompt-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+}
+
+.mark-filled-prompt h3 {
+  margin: 0 0 6px;
+  color: #111111;
+  font-size: 22px;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  font-weight: 760 !important;
+}
+
+.mark-filled-prompt p {
+  margin: 0;
+  color: #667085 !important;
+  font-size: 14.5px;
+  line-height: 1.55;
+  font-weight: 500 !important;
+}
+
+.mark-filled-prompt strong {
+  display: block;
+  margin-top: 10px;
+  color: #111111;
+  font-size: 15px;
+  font-weight: 760;
+}
+
+.mark-filled-prompt-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.mark-filled-prompt .mark-filled-btn,
+.mark-filled-prompt .filled-later-btn {
+  min-height: 42px;
+  border-radius: 999px;
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 720 !important;
+  cursor: pointer;
+  box-shadow: none !important;
+}
+
+.mark-filled-prompt .mark-filled-btn {
+  background: #256c2b !important;
+  color: #ffffff !important;
+  border: 1px solid #256c2b !important;
+}
+
+.mark-filled-prompt .mark-filled-btn:hover {
+  background: #1f5e25 !important;
+}
+
+.mark-filled-prompt .filled-later-btn {
+  background: #ffffff !important;
+  color: #256c2b !important;
+  border: 1px solid rgba(37, 108, 43, 0.2) !important;
+}
+
+.filled-prompt-error {
+  margin-top: 10px !important;
+  color: #b42318 !important;
+  font-size: 13.5px !important;
+  font-weight: 650 !important;
+}
+
+@media (max-width: 760px) {
+  .mark-filled-prompt {
+    display: grid;
+    padding: 18px;
+    border-radius: 24px;
+  }
+
+  .mark-filled-prompt-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .mark-filled-prompt .mark-filled-btn,
+  .mark-filled-prompt .filled-later-btn {
+    width: 100%;
+  }
+}
+
+/* ---------- JOB FRESHNESS INDICATORS ---------- */
+
+.job-freshness-badge {
+  width: fit-content;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 720 !important;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  border: 1px solid rgba(17, 17, 17, 0.1);
+}
+
+.job-freshness-badge svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+}
+
+.job-freshness-badge.green {
+  background: #eef8e8;
+  color: #256c2b;
+  border-color: rgba(37, 108, 43, 0.16);
+}
+
+.job-freshness-badge.blue {
+  background: #eef4ff;
+  color: #175cd3;
+  border-color: rgba(23, 92, 211, 0.16);
+}
+
+.job-freshness-badge.amber {
+  background: #fff8cc;
+  color: #7a5a00;
+  border-color: rgba(122, 90, 0, 0.14);
+}
+
+.job-freshness-badge.red {
+  background: #fff4f2;
+  color: #b42318;
+  border-color: rgba(180, 35, 24, 0.16);
+}
+
+.job-freshness-badge.slate {
+  background: #f2f4f7;
+  color: #667085;
+  border-color: rgba(102, 112, 133, 0.18);
+}
+
+.job-freshness-meta {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  color: #667085;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.job-freshness-meta span {
+  color: #667085 !important;
+  font-size: 13px;
+  font-weight: 500 !important;
+}
+
+.job-freshness-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: #c0c6d0;
+}
+
+/* ---------- FILLED / CLOSED JOB NOTICE ---------- */
+
+.job-not-accepting-box {
+  width: 100%;
+  border-radius: 18px;
+  border: 1px solid rgba(102, 112, 133, 0.16);
+  background: #f2f4f7;
+  color: #4b5563;
+  padding: 14px 16px;
+  font-size: 14.5px;
+  line-height: 1.5;
+  font-weight: 650;
+}
+
+/* ---------- SUCCESS ICON CLEANER ---------- */
+
+.success-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  background: #eef8e8;
+  border: 1px solid rgba(37, 108, 43, 0.14);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: #256c2b;
+}
+
+/* ============================= */
+/* MOBILE-FIRST JOB FRESHNESS FIX */
+/* ============================= */
+
+.job-freshness-line {
+  margin-top: -8px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: #667085;
+  font-size: 13.5px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.job-freshness-line span {
+  color: #667085 !important;
+  font-size: 13.5px;
+  font-weight: 600 !important;
+}
+
+.freshness-separator {
+  color: #98a2b3 !important;
+}
+
+.job-top {
+  align-items: flex-start;
+}
+
+.job-top .status-badge {
+  flex-shrink: 0;
+  margin-top: 2px;
+  background: #fff8cc;
+  border: 1px solid rgba(17, 17, 17, 0.18);
+  color: #111111;
+  font-weight: 720 !important;
+  text-transform: lowercase;
+}
+
+.job-card .shop-name {
+  margin-bottom: 10px;
+  color: #667085 !important;
+  font-weight: 650 !important;
+}
+
+.job-card .verified-badge {
+  margin-left: 8px;
+  vertical-align: middle;
+  background: #eef8e8;
+  color: #256c2b;
+  border: 1px solid rgba(37, 108, 43, 0.18);
+  font-size: 11px;
+  padding: 5px 9px;
+  font-weight: 720 !important;
+}
+
+/* Remove old freshness badge look from job cards if still present */
+.job-card .job-freshness-badge,
+.mobile-job-card .job-freshness-badge {
+  display: none !important;
+}
+
+/* Mobile card cleanup */
+@media (max-width: 760px) {
+  .job-card {
+    padding: 18px;
+    border-radius: 26px;
+  }
+
+  .job-top {
+    display: flex;
+    gap: 12px;
+  }
+
+  .job-top h3 {
+    font-size: 22px;
+    line-height: 1.08;
+    letter-spacing: -0.04em;
+    margin-bottom: 8px;
+  }
+
+  .job-top .status-badge {
+    font-size: 11px;
+    padding: 6px 9px;
+  }
+
+  .job-freshness-line {
+    margin-top: -4px;
+    margin-bottom: 12px;
+    font-size: 12.5px;
+  }
+
+  .job-freshness-line span {
+    font-size: 12.5px;
+  }
+
+  .job-info {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .job-info p {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .job-desc {
+    font-size: 14px;
+    line-height: 1.55;
+    padding-top: 12px;
+  }
+
+  .job-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .job-actions .btn,
+  .job-actions .primary-btn,
+  .job-actions .whatsapp-share-btn {
+    width: 100%;
+    min-height: 46px;
+  }
 }
